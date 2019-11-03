@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" prefHeight="800.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ImageViewLayoutController">
+
+    <ImageView fx:id="imgView" pickOnBounds="true" preserveRatio="true" />
+</ScrollPane>

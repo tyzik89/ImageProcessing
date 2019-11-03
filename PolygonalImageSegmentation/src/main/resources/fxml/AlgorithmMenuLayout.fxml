@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory?>
+<?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxWidth="320.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AlgorithmMenuLayoutController">
+
+    <Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <panes>
+
+            <TitledPane fx:id="commonTools" animated="false" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Общие Инструменты">
+                <AnchorPane>
+                    <Button layoutX="46.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleMakeBinary" text="Бинарное изображение" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <tooltip>
+                            <Tooltip text="Сделать изображение бинарным" />
+                        </tooltip>
+                    </Button>
+                    <Label layoutX="14.0" layoutY="45.0" text="Порог:" AnchorPane.leftAnchor="0.0" />
+                    <Label fx:id="showBinaryThreshold" layoutX="68.0" layoutY="43.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="21.0" prefWidth="45.0" />
+                    <CheckBox fx:id="otsu" layoutX="17.0" layoutY="108.0" mnemonicParsing="false" onAction="#selectOtsu" text="порог OTSU" AnchorPane.leftAnchor="0.0" />
+                    <Slider fx:id="binarySlider" layoutX="14.0" layoutY="64.0" max="100.0" onMouseClicked="#changeBinarySlider" onMouseDragged="#changeBinarySlider" showTickLabels="true" showTickMarks="true" snapToTicks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <Separator layoutX="-2.0" layoutY="127.0" prefHeight="24.0" prefWidth="232.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <Button layoutX="61.0" layoutY="151.0" mnemonicParsing="false" onAction="#makeBlur" text="Размытие по Гауссу" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <tooltip>
+                            <Tooltip text="Размытие по Гауссу" />
+                        </tooltip>
+                    </Button>
+                    <Label layoutX="18.0" layoutY="189.0" text="Размер фильтра Гаусса:" AnchorPane.leftAnchor="0.0" />
+                    <Label fx:id="showSizeGaussFilterCommon" layoutX="184.0" layoutY="187.0" prefHeight="21.0" prefWidth="39.0" />
+                    <Slider fx:id="sizeGaussFilterCommon" blockIncrement="1" layoutX="14.0" layoutY="213.0" majorTickUnit="5" max="10" minorTickCount="1" onMouseClicked="#changeSizeGaussFilterCommon" onMouseDragged="#changeSizeGaussFilterCommon" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                </AnchorPane>
+            </TitledPane>
+
+            <TitledPane fx:id="cannyTools" animated="false" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Алгоритм Кэнни">
+                <AnchorPane>
+                    <Label layoutX="12.0" layoutY="14.0" text="Пороговое значение:" AnchorPane.leftAnchor="0.0" />
+                    <Label fx:id="showThresholdCanny" layoutX="171.0" layoutY="14.0" prefHeight="17.0" prefWidth="36.0" />
+                    <Slider fx:id="thresholdCanny" layoutX="6.0" layoutY="36.0" max="200.0" onMouseClicked="#changeThresholdCanny" onMouseDragged="#changeThresholdCanny" showTickLabels="true" showTickMarks="true" snapToTicks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <Separator layoutX="1.0" layoutY="83.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <Label layoutX="4.0" layoutY="105.0" text="Размер фильтра Гаусса:" AnchorPane.leftAnchor="0.0" />
+                    <TextField fx:id="sizeGaussFilter" layoutX="207.0" layoutY="101.0" prefHeight="25.0" prefWidth="43.0" text="0" AnchorPane.rightAnchor="0.0" />
+                    <Button layoutX="12.0" layoutY="267.0" mnemonicParsing="false" onAction="#handleApplyCanny" text="Применить" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <Separator layoutX="1.0" layoutY="146.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Label layoutX="14.0" layoutY="158.0" text="Дополнительные параметры:" underline="true" AnchorPane.leftAnchor="0.0" />
+               <Label layoutX="18.0" layoutY="191.0" text="Ядро Собеля:" AnchorPane.leftAnchor="0.0" />
+               <CheckBox fx:id="gradientL2" layoutX="20.0" layoutY="224.0" mnemonicParsing="false" text="L2 Градиент" AnchorPane.leftAnchor="0.0">
+                   <tooltip>
+                       <Tooltip text="Флаг, указывающий на возможность использования более точного расчёта величины градиента" />
+                   </tooltip>
+               </CheckBox>
+               <Spinner fx:id="sizeSobelKernel" layoutX="105.0" layoutY="187.0" maxHeight="25.0" maxWidth="58.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="58.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0">
+                   <valueFactory>
+                       <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="2" initialValue="3" max="7" min="3" />
+                   </valueFactory>
+                   <tooltip>
+                       <Tooltip text="Значение может быть между 3 и 7. Нечётное" />
+                   </tooltip>
+               </Spinner>
+                </AnchorPane>
+            </TitledPane>
+
+            <TitledPane fx:id="houghTools" animated="false" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Преобразование Хафа">
+                <AnchorPane>
+                    <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Tab text="Линии">
+                            <AnchorPane>
+                                <RadioButton fx:id="radiobHoughClassic" layoutX="46.0" layoutY="26.0" mnemonicParsing="false" onAction="#changeRadioButtonHoughClassic" selected="true" text="классический" AnchorPane.leftAnchor="0.0">
+                                    <tooltip>
+                                        <Tooltip text="Классический метод трансформации Хафа.&#10;Каждая линия представляется двумя числами типа float (rho, theta), &#10;где rho — дистанция между точкой (0,0) и линией, &#10;а theta — угол между осью x и нормалью к линии (т.е. матрица должна иметь тип of CV_32FC2)" />
+                                    </tooltip>
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="toggleGroupHough" />
+                                    </toggleGroup>
+                                </RadioButton>
+                                <RadioButton fx:id="radiobHoughProbably" layoutX="46.0" layoutY="49.0" mnemonicParsing="false" onAction="#changeRadioButtonHoughProbably" selected="false" text="вероятностный" toggleGroup="$toggleGroupHough" AnchorPane.leftAnchor="0.0">
+                                    <tooltip>
+                                        <Tooltip text="Вероятностный метод трансформации Хафа &#10;(более эффективен с случае изображений с несколькими длинными линейными сегментами). &#10;Возвращает сегменты линии, которые представляются точками начала и конца &#10;(т.е. матрица должна иметь тип of CV_32SC4)" />
+                                    </tooltip>
+                                </RadioButton>
+                                <Label layoutX="18.0" layoutY="3.0" text="Метод преобразования Хафа:" AnchorPane.leftAnchor="0.0" />
+                                <Separator layoutY="73.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                                <Label layoutX="13.0" layoutY="97.0" text="- по дистанции(пиксели):" AnchorPane.leftAnchor="0.0" />
+                                <Label layoutX="12.0" layoutY="134.0" text="- по углу (радианы):" AnchorPane.leftAnchor="0.0" />
+                                <Label layoutX="7.0" layoutY="73.0" text="Разрешения:" AnchorPane.leftAnchor="0.0" />
+                                <Spinner fx:id="spinnerHoughDistance" editable="true" layoutX="152.0" layoutY="93.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0">
+                                    <valueFactory>
+                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                    </valueFactory>
+                                    <tooltip>
+                                        <Tooltip text="В векторе (r,θ), хранящем обнаруженные линии &#10;- это разрешение параметра r в пикселях" />
+                                    </tooltip>
+                                </Spinner>
+                                <Spinner fx:id="spinnerHoughAngle" editable="true" layoutX="153.0" layoutY="130.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0">
+                                    <valueFactory>
+                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                    </valueFactory>
+                                    <tooltip>
+                                        <Tooltip text="В векторе (r,θ), хранящем обнаруженные линии &#10;- это разрешение параметра θ в радианах" />
+                                    </tooltip>
+                                </Spinner>
+                                <Slider fx:id="thresholdHoughSlider" layoutX="7.0" layoutY="203.0" onMouseClicked="#changeThresholdHough" onMouseDragged="#changeThresholdHough" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <tooltip>
+                                        <Tooltip text="Минимальное количество пересечений, для обнаружения линии. &#10;Линия обнаруживается, если аккумулирующий параметр больше порогового значения." />
+                                    </tooltip>
+                                </Slider>
+                                <Label layoutX="9.0" layoutY="176.0" text="Пороговый параметр: " AnchorPane.leftAnchor="0.0" />
+                                <Separator layoutX="2.0" layoutY="168.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                                <Label fx:id="thresholdHoughLabel" layoutX="167.0" layoutY="169.0" prefHeight="31.0" prefWidth="44.0" />
+                                <Separator layoutX="-1.0" layoutY="253.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                                <Accordion AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="257.0">
+                                    <panes>
+                                        <TitledPane fx:id="titledPaneHoughClassic" animated="true" disable="false" expanded="true" text="Классический. Параметры.">
+                                            <AnchorPane>
+                                                <Label layoutX="17.0" layoutY="9.0" text="Делитель для расстояния:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="9.0" />
+                                                <Label layoutX="56.0" layoutY="48.0" text="Делитель для угла:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="48.0" />
+                                                <Label layoutX="7.0" layoutY="83.0" text="Мин. угол проверки линий:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="83.0" />
+                                                <Label layoutX="3.0" layoutY="118.0" text="Макс. угол проверки линий:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="118.0" />
+                                                <TextField fx:id="srnTextField" layoutX="169.0" layoutY="2.0" prefHeight="31.0" prefWidth="56.0" text="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Для многомасштабного преобразанования Хафа. &#10;Для точного разрешения расст. rho/srn. Если srn=0 and stn=0, то используется классическое преобразование.&#10;В другом случае параметры должны быть больше 0." />
+                                                    </tooltip>
+                                                </TextField>
+                                                <TextField fx:id="stnTextField" layoutX="169.0" layoutY="37.0" prefHeight="31.0" prefWidth="56.0" text="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="37.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Для многомасштабного преобразанования Хафа. &#10;Для точного разрешения: theta/stn. Если srn=0 and stn=0, то используется классическое преобразование. &#10;В другом случае параметры должны быть больше 0." />
+                                                    </tooltip>
+                                                </TextField>
+                                                <TextField fx:id="minThetaTextField" layoutX="169.0" layoutY="72.0" prefHeight="31.0" prefWidth="56.0" text="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="72.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Для стандартного и многомасштабного преобразования Хафа, &#10;минимальный угол для проверки линий. &#10;Должно попасть между 0 и max_theta." />
+                                                    </tooltip>
+                                                </TextField>
+                                                <TextField fx:id="maxThetaTextField" layoutX="169.0" layoutY="107.0" prefHeight="31.0" prefWidth="56.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="107.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Для стандартного и многомасштабного преобразования Хафа, максимальный угол для проверки линий. Должно попасть между min_theta и CV_PI" />
+                                                    </tooltip>
+                                                </TextField>
+                                            </AnchorPane>
+                                        </TitledPane>
+                                        <TitledPane fx:id="titledPaneHoughProbably" animated="true" disable="true" expanded="false" text="Вероятностный. Параметры:">
+                                            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="210.0">
+                                                <Label layoutX="13.0" layoutY="8.0" text="Минимальная длинна линии:" AnchorPane.leftAnchor="0.0" />
+                                                <Spinner fx:id="spinnerHoughProbablyMinLineLength" editable="true" layoutX="20.0" layoutY="31.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="190.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="31.0">
+                                                    <valueFactory>
+                                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                                    </valueFactory>
+                                                    <tooltip>
+                                                        <Tooltip text="Минимальная длинна линии." />
+                                                    </tooltip>
+                                                </Spinner>
+                                                <Label layoutX="12.0" layoutY="75.0" text="Макс. расст. между точками:" AnchorPane.leftAnchor="0.0" />
+                                                <Spinner fx:id="spinnerHoughProbablyMaxLineGap" editable="true" layoutX="19.0" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="190.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+                                                    <valueFactory>
+                                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                                    </valueFactory>
+                                                    <tooltip>
+                                                        <Tooltip text="Максимально допустимый разрыв между точками на одной линии, &#10;чтобы связать их." />
+                                                    </tooltip>
+                                                </Spinner>
+                                            </AnchorPane>
+                                        </TitledPane>
+                                    </panes>
+                                </Accordion>
+                            </AnchorPane>
+                        </Tab>
+                        <Tab text="Окружности">
+                            <AnchorPane />
+                        </Tab>
+                    </TabPane>
+                    <Button layoutX="147.0" layoutY="532.0" mnemonicParsing="false" onAction="#handleApplyHough" text="Применить" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                </AnchorPane>
+            </TitledPane>
+
+            <TitledPane fx:id="watershedTools" animated="false" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Сегментация по &quot;Водоразделам&quot;">
+                <AnchorPane>
+                    <Button layoutX="12.0" layoutY="82.0" mnemonicParsing="false" onAction="#handleApplyWatershed" text="Применить" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <ToggleButton fx:id="watershedMode" layoutX="90.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleWatershedMode" text="Ручной режим" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <tooltip>
+                            <Tooltip text="Режим расстановки маркеров на изображении" />
+                        </tooltip>
+                    </ToggleButton>
+                </AnchorPane>
+            </TitledPane>
+
+        </panes>
+
+        <effect>
+            <DropShadow />
+        </effect>
+
+    </Accordion>
+</AnchorPane>
