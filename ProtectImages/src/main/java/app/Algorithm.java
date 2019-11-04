@@ -81,7 +81,7 @@ public class Algorithm {
     public ArrayList<Integer> getHashCodeForEachSegment(ArrayList<Mat> segments) {
         ArrayList<Integer> hashCodes = new ArrayList<>();
         for (Mat segment : segments) {
-            Core.dct();
+            //Core.dct();
         }
         return hashCodes;
     }
