@@ -30,7 +30,7 @@ public class WatershedSegmentation implements Algorithm {
     public Mat doAlgorithm(Mat frame) {
         LOGGER.debug("Started processing");
 
-        //Преобраовываем матрицу в 3-х канальное, 8-битовое
+        //Преобразовываем матрицу в 3-х канальную, 8-битовую
         Mat frame8SC3 = new Mat();
         Imgproc.cvtColor(frame, frame8SC3, Imgproc.COLOR_BGRA2BGR);
 
@@ -40,7 +40,7 @@ public class WatershedSegmentation implements Algorithm {
                 Imgproc.RETR_CCOMP,
                 Imgproc.CHAIN_APPROX_SIMPLE);
 
-        // Отрисовываем контуры разными оттенками серого
+        // Отрисовываем контуры разными цветами
         Mat markers = new Mat(frame8SC3.size(), CvType.CV_32SC1,  new Scalar(0));
         int color = 80;
         for (int i = 0, j = contours.size(); i < j; i++) {
@@ -48,6 +48,7 @@ public class WatershedSegmentation implements Algorithm {
             color += 20;
         }
 
+        //Применяем алгоритм водоразделов
         Imgproc.watershed(frame8SC3, markers);
 
         // Отображаем результат

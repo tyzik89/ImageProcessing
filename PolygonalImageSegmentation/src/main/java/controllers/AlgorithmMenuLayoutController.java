@@ -310,6 +310,7 @@ public class AlgorithmMenuLayoutController implements Observer {
         final double maxX = imageView.getImage().getWidth();
         final double maxY = imageView.getImage().getHeight();
 
+        //Список маркеров одного цвета
         List<Line> lineList = new ArrayList<>();
 
         imageView.setOnMousePressed(new EventHandler<MouseEvent>() {

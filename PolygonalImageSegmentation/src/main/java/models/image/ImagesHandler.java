@@ -93,7 +93,7 @@ public class ImagesHandler implements Observable {
         for (Line line : lineList) {
             Imgproc.line(mask,
                     new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
-                    ImageUtils.COLOR_WHITE, 3);
+                    ImageUtils.COLOR_WHITE, 2);
         }
         storageImages.setTempImage(ImageUtils.matToImageFX(mask));
         notifyObservers(NotifyConstants.TEMP_IMAGE_READY);

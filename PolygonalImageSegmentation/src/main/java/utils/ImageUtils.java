@@ -11,9 +11,30 @@ public final class ImageUtils {
     public static final Scalar COLOR_BLACK = colorRGB(0, 0, 0);
     public static final Scalar COLOR_WHITE = colorRGB(255, 255, 255);
     public static final Scalar COLOR_RED = colorRGB(255, 0, 0);
+    public static final Scalar COLOR_BLUE = colorRGB(0, 0, 255);
+    public static final Scalar COLOR_GREEN = colorRGB(0, 128, 0);
+    public static final Scalar COLOR_YELLOW = colorRGB(255, 255, 0);
+    public static final Scalar COLOR_GRAY = colorRGB(128, 128, 128);
 
     private static Scalar colorRGB(double red, double green, double blue) {
         return new Scalar(blue, green, red);
+    }
+
+    public static Scalar colorRGBA(double red, double green, double blue,
+                                   double alpha) {
+        return new Scalar(blue, green, red, alpha);
+    }
+
+    public static Scalar colorRGB(javafx.scene.paint.Color c) {
+        return new Scalar((double) Math.round(c.getBlue() * 255),
+                (double) Math.round(c.getGreen() * 255),
+                (double) Math.round(c.getRed() * 255));
+    }
+    public static Scalar colorRGBA(javafx.scene.paint.Color c) {
+        return new Scalar((double) Math.round(c.getBlue() * 255),
+                (double) Math.round(c.getGreen() * 255),
+                (double) Math.round(c.getRed() * 255),
+                (double) Math.round(c.getOpacity() * 255));
     }
 
     /**
