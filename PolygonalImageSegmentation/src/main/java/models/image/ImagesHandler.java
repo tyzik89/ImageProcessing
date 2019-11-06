@@ -4,14 +4,13 @@ import constants.NotifyConstants;
 import fxelements.SingletonProcess;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import models.algorithms.*;
+import models.algorithms.Algorithm;
 import models.notification.Observable;
 import models.notification.Observer;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -19,8 +18,10 @@ import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Получает запрос на образобку от контроллеров
@@ -85,20 +86,38 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new HoughConversionAlgorithm(typeHoughMethodClassic, distance, angle, threshold, params));
     }
 
-    public void doWatershedSegmentationManualMode(List<Line> lineList) {
-        // Рисуем маркеры
+    public void doWatershedSegmentationManualMode(Map<Color, List<Line>> colorListMap) {
         Mat matCurr = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
-        Mat mask = new Mat(matCurr.size(), CvType.CV_8UC1,  ImageUtils.COLOR_BLACK);
+        Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
 
-        for (Line line : lineList) {
-            Imgproc.line(mask,
-                    new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
-                    ImageUtils.COLOR_WHITE, 2);
+        for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
+            Color currentColor = colorListEntry.getKey();
+            List<Line> currentLines = colorListEntry.getValue();
+
+            // Рисуем маркеры
+            Mat mask = new Mat(matCurr.size(), CvType.CV_8U,  ImageUtils.COLOR_BLACK);
+            for (Line line : currentLines) {
+                Imgproc.line(mask,
+                        new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
+                        ImageUtils.colorRGB(currentColor), 1);
+            }
+
+            // Находим контуры маркеров
+            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            Imgproc.findContours(mask, contours, new Mat(),
+                    Imgproc.RETR_CCOMP,
+                    Imgproc.CHAIN_APPROX_SIMPLE);
+
+            // Отрисовываем контуры нужным цветом
+            for (int i = 0; i < contours.size(); i++) {
+                Imgproc.drawContours(markers, contours, i, ImageUtils.colorRGB(currentColor), 1);
+            }
         }
-        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
-        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
 
-        doMakeAlgorithm(new WatershedSegmentation(mask));
+//        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
+//        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
+
+        doMakeAlgorithm(new WatershedSegmentation(markers));
     }
 
     public void doWatershedSegmentationAutoMode(Mat detectedLines) {

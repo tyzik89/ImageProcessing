@@ -23,9 +23,7 @@ import models.notification.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class AlgorithmMenuLayoutController implements Observer {
 
@@ -283,6 +281,7 @@ public class AlgorithmMenuLayoutController implements Observer {
 
         Button run = new Button("Запустить обработку");
         ColorPicker colorPicker = new ColorPicker();
+        //TODO изменить начальное значение, т.к. не работает в маркеровании
         colorPicker.setValue(Color.RED);
         HBox hBoxPanelTop = new HBox();
         hBoxPanelTop.getChildren().addAll(run, colorPicker);
@@ -310,9 +309,6 @@ public class AlgorithmMenuLayoutController implements Observer {
         final double maxX = imageView.getImage().getWidth();
         final double maxY = imageView.getImage().getHeight();
 
-        //Список маркеров одного цвета
-        List<Line> lineList = new ArrayList<>();
-
         imageView.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
@@ -323,16 +319,29 @@ public class AlgorithmMenuLayoutController implements Observer {
             }
         });
 
+        //Цветные маркеры
+        Map<Color, List<Line>> colorListMap = new HashMap<Color, List<Line>>();
+
         imageView.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent me) {
+                Color color = colorPicker.getValue();
                 if (me.getSceneX() < maxX && me.getSceneY() < maxY) {
                     Line line = new Line(initX[0], initY[0], me.getX(), me.getY());
                     line.setFill(null);
-                    line.setStroke(colorPicker.getValue());
+                    line.setStroke(color);
                     line.setStrokeWidth(2);
                     anchorPane.getChildren().add(line);
-                    lineList.add(line);
+
+                    List<Line> lineList = colorListMap.get(color);
+                    if (lineList != null) {
+                        lineList.add(line);
+                    } else {
+                        lineList = new ArrayList<>();
+                        lineList.add(line);
+                        colorListMap.put(color, lineList);
+                    }
+
 //                    System.out.println(line.getStartX() + " " + line.getEndX());
 //                    System.out.println(line.getEndX() + " " + line.getEndY());
                 }
@@ -345,7 +354,7 @@ public class AlgorithmMenuLayoutController implements Observer {
         run.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                imagesHandler.doWatershedSegmentationManualMode(lineList);
+                imagesHandler.doWatershedSegmentationManualMode(colorListMap);
                 //Закрываем текущее окно
                 stageWatershed.close();
             }

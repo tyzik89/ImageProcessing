@@ -20,10 +20,10 @@ public class WatershedSegmentation implements Algorithm {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WatershedSegmentation.class);
 
-    private Mat mask;
+    private Mat markers;
 
-    public WatershedSegmentation(Mat mask) {
-        this.mask = mask;
+    public WatershedSegmentation(Mat markers) {
+        this.markers = markers;
     }
 
     @Override
@@ -33,20 +33,6 @@ public class WatershedSegmentation implements Algorithm {
         //Преобразовываем матрицу в 3-х канальную, 8-битовую
         Mat frame8SC3 = new Mat();
         Imgproc.cvtColor(frame, frame8SC3, Imgproc.COLOR_BGRA2BGR);
-
-        // Находим контуры маркеров
-        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Imgproc.findContours(mask, contours, new Mat(),
-                Imgproc.RETR_CCOMP,
-                Imgproc.CHAIN_APPROX_SIMPLE);
-
-        // Отрисовываем контуры разными цветами
-        Mat markers = new Mat(frame8SC3.size(), CvType.CV_32SC1,  new Scalar(0));
-        int color = 80;
-        for (int i = 0, j = contours.size(); i < j; i++) {
-            Imgproc.drawContours(markers, contours, i, Scalar.all(color), 1);
-            color += 20;
-        }
 
         //Применяем алгоритм водоразделов
         Imgproc.watershed(frame8SC3, markers);

@@ -139,7 +139,7 @@ public class RootLayoutController {
 
     @FXML
     private void handleLoad(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
+        /*FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Выбрать изображение для обработки");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Изображения", "*.png", "*.jpg", "*.bmp"),
@@ -147,7 +147,9 @@ public class RootLayoutController {
 
 
         File selectedFile = fileChooser.showOpenDialog(mainApp.getPrimaryStage().getOwner());
-        if (selectedFile != null && selectedFile.exists())
+        if (selectedFile != null && selectedFile.exists())*/
+        //TODO UNCOMMENT FINAL
+        File selectedFile = new File("E:\\1.jpg");
             imagesHandler.load(selectedFile);
     }
 
