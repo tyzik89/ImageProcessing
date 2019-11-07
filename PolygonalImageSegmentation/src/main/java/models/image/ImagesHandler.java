@@ -136,6 +136,7 @@ public class ImagesHandler implements Observable {
     }
 
     public void doWatershedSegmentationManualMode(Map<Color, List<Line>> colorListMap) {
+        //TODO СЛЕДАТЬ ОТРИСОВКУ МАРКЕРОВ ЦВЕТОМ
         Mat matCurr = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
         //Создание маркерного изображения для алгоритма водоразделов
         Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
