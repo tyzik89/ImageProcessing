@@ -6,19 +6,21 @@ import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import models.algorithms.*;
 import models.algorithms.Algorithm;
+import models.algorithms.*;
 import models.notification.Observable;
 import models.notification.Observer;
 import org.opencv.core.*;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 1. Получает запрос с параметрами от контроллеров
@@ -121,7 +123,7 @@ public class ImagesHandler implements Observable {
         notifyObservers(NotifyConstants.IMAGE_READY);
     }
 
-/*====================================================================================================================*/
+    /*====================================================================================================================*/
 
     public void doMakeBinary(int threshold, boolean isOtsu) {
         doMakeAlgorithm(new BinaryImageAlgorithm(threshold, isOtsu));
@@ -136,33 +138,25 @@ public class ImagesHandler implements Observable {
     }
 
     public void doWatershedSegmentationManualMode(Map<Color, List<Line>> colorListMap) {
-        //TODO СЛЕДАТЬ ОТРИСОВКУ МАРКЕРОВ ЦВЕТОМ
         Mat matCurr = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
-        //Маркерное изображение для алгоритма водоразделов
+        //Создание маркерного изображения для алгоритма водоразделов
         Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
 
-        //Для рисования цветной заливки областей. Цвет и список контуров этого цвета
-        Map<Scalar, ArrayList<MatOfPoint>> scalarContoursMap = new HashMap<Scalar, ArrayList<MatOfPoint>>();
-
         for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
-            //Получаем набор цветов и линий каждого цвета
+            //Получаем набор линий каждого цвета
             Color currentColor = colorListEntry.getKey();
+            Scalar currentColorScalar = ImageUtils.colorRGB2GRAY(currentColor);
             List<Line> currentLines = colorListEntry.getValue();
-            //Усредняем цвет будущего маркера (градации серого)
-            Scalar currentColorScalarGray = ImageUtils.colorRGB2GRAY(currentColor);
 
-            // Рисуем маску с маркерами
+            // Рисуем маркеры
             Mat mask = new Mat(matCurr.size(), CvType.CV_8U,  ImageUtils.COLOR_BLACK);
             for (Line line : currentLines) {
-                Imgproc.line(
-                        mask,
-                        new Point(line.getStartX(), line.getStartY()),
-                        new Point(line.getEndX(), line.getEndY()),
-                        currentColorScalarGray,
-                        1);
+                Imgproc.line(mask,
+                        new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
+                        currentColorScalar, 1);
             }
 
-            // Находим контуры маркеров в маске с маркерами
+            // Находим контуры маркеров
             ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
             Imgproc.findContours(mask, contours, new Mat(),
                     Imgproc.RETR_CCOMP,
@@ -170,26 +164,15 @@ public class ImagesHandler implements Observable {
 
             // Отрисовываем контуры нужным цветом
             for (int i = 0; i < contours.size(); i++) {
-                Imgproc.drawContours(markers, contours, i, currentColorScalarGray, 1);
-            }
-
-            //Заполняем карту Scalar цветом и набором контуров этого цвета
-            ArrayList<MatOfPoint> matOfPoints = scalarContoursMap.get(ImageUtils.colorRGB(currentColor));
-            if (matOfPoints != null) {
-                matOfPoints.addAll(contours);
-            } else {
-                matOfPoints = new ArrayList<MatOfPoint>();
-                matOfPoints.addAll(contours);
-                scalarContoursMap.put(ImageUtils.colorRGB(currentColor), matOfPoints);
+                Imgproc.drawContours(markers, contours, i, currentColorScalar, 1);
             }
         }
 
 //        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
 //        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
 
-        doMakeAlgorithm(new WatershedSegmentation(markers, scalarContoursMap));
+        doMakeAlgorithm(new WatershedSegmentation(markers));
     }
-
 
     public void doWatershedSegmentationAutoMode(Mat detectedLines) {
         Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
