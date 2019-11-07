@@ -283,9 +283,7 @@ public class AlgorithmMenuLayoutController implements Observer {
         borderPane.maxWidth(1300);
 
         Button run = new Button("Запустить обработку");
-        ColorPicker colorPicker = new ColorPicker();
-        //TODO изменить начальное значение, т.к. не работает в маркеровании
-        colorPicker.setValue(Color.RED);
+        ColorPicker colorPicker = new ColorPicker(Color.RED);
         HBox hBoxPanelTop = new HBox();
         hBoxPanelTop.getChildren().addAll(run, colorPicker);
 

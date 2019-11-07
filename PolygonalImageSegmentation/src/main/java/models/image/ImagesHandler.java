@@ -145,7 +145,7 @@ public class ImagesHandler implements Observable {
         for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
             //Получаем набор линий каждого цвета
             Color currentColor = colorListEntry.getKey();
-            Scalar currentColorScalar = ImageUtils.colorRGB2GRAY(currentColor);
+            Scalar currentColorScalarGray = ImageUtils.colorRGB2GRAY(currentColor);
             List<Line> currentLines = colorListEntry.getValue();
 
             // Рисуем маркеры
@@ -153,7 +153,7 @@ public class ImagesHandler implements Observable {
             for (Line line : currentLines) {
                 Imgproc.line(mask,
                         new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
-                        currentColorScalar, 1);
+                        currentColorScalarGray, 1);
             }
 
             // Находим контуры маркеров
@@ -164,7 +164,7 @@ public class ImagesHandler implements Observable {
 
             // Отрисовываем контуры нужным цветом
             for (int i = 0; i < contours.size(); i++) {
-                Imgproc.drawContours(markers, contours, i, currentColorScalar, 1);
+                Imgproc.drawContours(markers, contours, i, currentColorScalarGray, 1);
             }
         }
 
