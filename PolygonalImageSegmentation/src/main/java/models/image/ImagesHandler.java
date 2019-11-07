@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 1. Получает запрос с параметрами от контроллеров
@@ -143,6 +140,9 @@ public class ImagesHandler implements Observable {
         //Создание маркерного изображения для алгоритма водоразделов
         Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
 
+        //Для рисования цветной заливки областей. Цвет и список контуров этого цвета
+        Map<Scalar, ArrayList<MatOfPoint>> scalarContoursMap = this.convertColor2ScalarBetweenMap(colorListMap);
+
         for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
             //Получаем набор линий каждого цвета
             Color currentColor = colorListEntry.getKey();
@@ -167,6 +167,10 @@ public class ImagesHandler implements Observable {
             for (int i = 0; i < contours.size(); i++) {
                 Imgproc.drawContours(markers, contours, i, currentColorScalar, 1);
             }
+
+            ArrayList<MatOfPoint> matOfPoints = scalarContoursMap.get(currentColorScalar);
+            matOfPoints.addAll(contours);
+            scalarContoursMap.put(currentColorScalar, matOfPoints);
         }
 
 //        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
@@ -174,6 +178,23 @@ public class ImagesHandler implements Observable {
 
         doMakeAlgorithm(new WatershedSegmentation(markers));
     }
+
+    /**
+     * Конфертация цвета Color.JavaFx --> Scalar.OpenCV
+     *
+     * @param colorListMap карта с цветами javafx и списком объектов Line
+     * @return карта с ключами Scalar цвета и пустыми значениями контуров
+     */
+    private Map<Scalar, ArrayList<MatOfPoint>> convertColor2ScalarBetweenMap(Map<Color, List<Line>> colorListMap) {
+        Map<Scalar, ArrayList<MatOfPoint>> scalarPointsMap = new HashMap<>();
+
+        for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
+            Color currentColor = colorListEntry.getKey();
+            scalarPointsMap.put(ImageUtils.colorRGB(currentColor), new ArrayList<MatOfPoint>());
+        }
+        return scalarPointsMap;
+    }
+
 
     public void doWatershedSegmentationAutoMode(Mat detectedLines) {
         Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());

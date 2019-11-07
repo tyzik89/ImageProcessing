@@ -1,9 +1,6 @@
 package models.algorithms;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +36,8 @@ public class WatershedSegmentation implements Algorithm {
         Imgproc.watershed(frame8SC3, markers);
 
         // Отображаем результат
-        Mat result = new Mat();
-        markers.convertTo(result, CvType.CV_8U);
+        Mat result = Mat.zeros(markers.size(), CvType.CV_8U);
+        markers.convertTo(result, CvType.CV_8UC1);
 
         return result;
     }
