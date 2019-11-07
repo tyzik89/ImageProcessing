@@ -125,7 +125,7 @@ public class ImagesHandler implements Observable {
     }
 
 /*====================================================================================================================*/
-    
+
     public void doMakeBinary(int threshold, boolean isOtsu) {
         doMakeAlgorithm(new BinaryImageAlgorithm(threshold, isOtsu));
     }
@@ -140,10 +140,13 @@ public class ImagesHandler implements Observable {
 
     public void doWatershedSegmentationManualMode(Map<Color, List<Line>> colorListMap) {
         Mat matCurr = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
+        //Создание маркерного изображения для алгоритма водоразделов
         Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
 
         for (Map.Entry<Color, List<Line>> colorListEntry : colorListMap.entrySet()) {
+            //Получаем набор линий каждого цвета
             Color currentColor = colorListEntry.getKey();
+            Scalar currentColorScalar = ImageUtils.colorRGB2GRAY(currentColor);
             List<Line> currentLines = colorListEntry.getValue();
 
             // Рисуем маркеры
@@ -151,7 +154,7 @@ public class ImagesHandler implements Observable {
             for (Line line : currentLines) {
                 Imgproc.line(mask,
                         new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
-                        ImageUtils.colorRGB(currentColor), 1);
+                        currentColorScalar, 1);
             }
 
             // Находим контуры маркеров
@@ -162,7 +165,7 @@ public class ImagesHandler implements Observable {
 
             // Отрисовываем контуры нужным цветом
             for (int i = 0; i < contours.size(); i++) {
-                Imgproc.drawContours(markers, contours, i, ImageUtils.colorRGB(currentColor), 1);
+                Imgproc.drawContours(markers, contours, i, currentColorScalar, 1);
             }
         }
 

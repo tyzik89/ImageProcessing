@@ -30,12 +30,19 @@ public final class ImageUtils {
                 (double) Math.round(c.getGreen() * 255),
                 (double) Math.round(c.getRed() * 255));
     }
+
     public static Scalar colorRGBA(javafx.scene.paint.Color c) {
         return new Scalar((double) Math.round(c.getBlue() * 255),
                 (double) Math.round(c.getGreen() * 255),
                 (double) Math.round(c.getRed() * 255),
                 (double) Math.round(c.getOpacity() * 255));
     }
+
+    public static Scalar colorRGB2GRAY(javafx.scene.paint.Color c) {
+        return new Scalar(
+                Math.round((c.getBlue() + c.getGreen() + c.getRed()) / 3 * 255));
+    }
+
 
     /**
      * Конвертация матрицы {@link Mat} в объект Image {@link Image} для JavaFX
