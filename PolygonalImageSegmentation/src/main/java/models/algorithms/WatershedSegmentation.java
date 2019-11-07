@@ -14,12 +14,13 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- *
+ * Алгоритм водоразделов - алгоритм наращивания областей, рекурсивно выполняющих процедуру группировки пикселей в подобласти по заранее заданным критериям.
  */
 public class WatershedSegmentation implements Algorithm {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WatershedSegmentation.class);
 
+    //Матрица с маркерами
     private Mat markers;
 
     public WatershedSegmentation(Mat markers) {

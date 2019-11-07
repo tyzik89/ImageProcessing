@@ -149,7 +149,7 @@ public class RootLayoutController {
         File selectedFile = fileChooser.showOpenDialog(mainApp.getPrimaryStage().getOwner());
         if (selectedFile != null && selectedFile.exists())*/
         //TODO UNCOMMENT FINAL
-        File selectedFile = new File("E:\\1.jpg");
+        File selectedFile = new File("src/main/resources/img/figures.png");
             imagesHandler.load(selectedFile);
     }
 

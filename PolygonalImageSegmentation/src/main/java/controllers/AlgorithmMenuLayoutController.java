@@ -25,6 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * Извлечение всех параметров, введённых пользователм, из UI
+ */
 public class AlgorithmMenuLayoutController implements Observer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AlgorithmMenuLayoutController.class);
@@ -266,7 +269,7 @@ public class AlgorithmMenuLayoutController implements Observer {
     }
 
     private void manualHandleWatershed() {
-        //        1	Modelity.NONE	Когда вы открываете новое окно с этой модальностью (modelity), новое окно будет независимым по отношению к родительскому окну.
+//        1	Modelity.NONE	Когда вы открываете новое окно с этой модальностью (modelity), новое окно будет независимым по отношению к родительскому окну.
 //            Вы можете интерактировать с родительским окном, или закрыть его не влияя на новое окно.
 //        2	Modelity.WINDOW_MODAL	Когда вы открываете новое окно с этой модальностью (modelity), новое окно блокирует родительское окно.
 //            Вы не можете интерактировать с родительским окном, до тех пор, пока это окно не закроется.
@@ -319,7 +322,7 @@ public class AlgorithmMenuLayoutController implements Observer {
             }
         });
 
-        //Цветные маркеры
+        //Карта цвета и соответсвующих ему линий
         Map<Color, List<Line>> colorListMap = new HashMap<Color, List<Line>>();
 
         imageView.setOnMouseDragged(new EventHandler<MouseEvent>() {

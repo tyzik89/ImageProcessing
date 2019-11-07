@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Получает запрос на образобку от контроллеров
- * вызывает нужный алгоритм
- * получает результат работы
- * отправляет уведомление контроллерам о готовности
+ * 1. Получает запрос с параметрами от контроллеров
+ * 2. Вызывает нужный алгоритм
+ * 3. Получает результат работы алгоритма
+ * 4. Отправляет уведомление контроллерам о выполнении запроса
  *
  * Работает с хранилищем изображений {@link StorageImages}
  * Работает с хранилищем матриц {@link StorageMatrix}
@@ -48,19 +48,69 @@ public class ImagesHandler implements Observable {
     }
 
     public void load(File file) {
-        // An image file on the hard drive.
-//        File file = new File("C:/MyImages/myphoto.jpg");
-        // --> file:/C:/MyImages/myphoto.jpg
-
         String localUrl = file.toURI().toString();
         Image image = new Image(localUrl);
-
-//        Mat mat = Imgcodecs.imread("src/main/resources/img/image1.png", Imgcodecs.IMREAD_UNCHANGED);
-//        Image image = ImageUtils.matToImageFX(mat);
 
         storageImages.init(image);
 
         notifyObservers(NotifyConstants.IMAGE_LOADED);
+    }
+
+    /**
+     * Общий метод запуска алгоритмов
+     * @param algorithm нужный алгоритм
+     */
+    private void doMakeAlgorithm(Algorithm algorithm){
+        /*Platform.runLater: если вам нужно обновить компонент GUI из потока, не являющегося GUI, вы можете использовать его,
+        чтобы поместить свое обновление в очередь, и оно будет обработано потоком GUI как можно скорее.
+
+        Task реализует интерфейс Worker который используется, когда вам нужно запустить длинную задачу вне потока GUI
+        (чтобы избежать зависания вашего приложения), но все же необходимо взаимодействовать с GUI на некотором этапе.*/
+
+        Task task = new Task<Void>() {
+            @Override public Void call() {
+                Mat mat = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
+                updateProgress(0.3, 1.0);
+                Mat result = algorithm.doAlgorithm(mat);
+                updateProgress(0.8, 1.0);
+                switchImagesOnNextStep(ImageUtils.matToImageFX(result));
+                updateProgress(1.0, 1.0);
+                return null;
+            }
+        };
+        SingletonProcess.getInstance().getProgressBar().progressProperty().bind(task.progressProperty());
+        SingletonProcess.getInstance().getProgressIndicator().progressProperty().bind(task.progressProperty());
+        //Запускаем обработку алгоритма в отдельном потоке
+        new Thread(task).start();
+    }
+
+    private synchronized void switchImagesOnNextStep(Image newImage) {
+        storageImages.switchImagesOnNextStep(newImage);
+        notifyObservers(NotifyConstants.IMAGE_READY);
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void notifyObservers(String message) {
+        for (Observer observer : observers) {
+            observer.notification(message);
+        }
+    }
+
+    public Image getCurrentImage() {
+        return storageImages.getCurrentImage();
+    }
+
+    public Image getSourceImage() {
+        return storageImages.getSourceImage();
+    }
+
+    public Image getTempImage() {
+        return storageImages.getTempImage();
     }
 
     /**
@@ -74,6 +124,8 @@ public class ImagesHandler implements Observable {
         notifyObservers(NotifyConstants.IMAGE_READY);
     }
 
+/*====================================================================================================================*/
+    
     public void doMakeBinary(int threshold, boolean isOtsu) {
         doMakeAlgorithm(new BinaryImageAlgorithm(threshold, isOtsu));
     }
@@ -121,7 +173,7 @@ public class ImagesHandler implements Observable {
     }
 
     public void doWatershedSegmentationAutoMode(Mat detectedLines) {
-        Mat matCurr = ImageUtils.imageFXToMat(storageImages.getSourceImage());
+        Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
         Mat mask = new Mat(matCurr.size(), CvType.CV_8UC1,  ImageUtils.COLOR_BLACK);
 
         for (int i = 0, r = detectedLines.rows(); i < r; i++) {
@@ -142,62 +194,5 @@ public class ImagesHandler implements Observable {
 
     public void doMakeBlur(int sizeGaussFilter) {
         doMakeAlgorithm(new GaussBlurAlgorithm(sizeGaussFilter));
-    }
-
-    /**
-     * Общий метод запуска алгоритмов
-     * @param algorithm нужный алгоритм
-     */
-    private void doMakeAlgorithm(Algorithm algorithm){
-        /*Platform.runLater: если вам нужно обновить компонент GUI из потока, не являющегося GUI, вы можете использовать его,
-        чтобы поместить свое обновление в очередь, и оно будет обработано потоком GUI как можно скорее.
-
-        Task реализует интерфейс Worker который используется, когда вам нужно запустить длинную задачу вне потока GUI
-        (чтобы избежать зависания вашего приложения), но все же необходимо взаимодействовать с GUI на некотором этапе.*/
-
-        Task task = new Task<Void>() {
-            @Override public Void call() {
-                Mat mat = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
-                updateProgress(0.3, 1.0);
-                Mat result = algorithm.doAlgorithm(mat);
-                updateProgress(0.8, 1.0);
-                switchImagesOnNextStep(ImageUtils.matToImageFX(result));
-                updateProgress(1.0, 1.0);
-                return null;
-            }
-        };
-        SingletonProcess.getInstance().getProgressBar().progressProperty().bind(task.progressProperty());
-        SingletonProcess.getInstance().getProgressIndicator().progressProperty().bind(task.progressProperty());
-        //Запускаем обработку алгоритма в отдельном потоке
-        new Thread(task).start();
-    }
-
-    @Override
-    public void registerObserver(Observer observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void notifyObservers(String message) {
-        for (Observer observer : observers) {
-            observer.notification(message);
-        }
-    }
-
-    public Image getCurrentImage() {
-        return storageImages.getCurrentImage();
-    }
-
-    public Image getSourceImage() {
-        return storageImages.getSourceImage();
-    }
-
-    public Image getTempImage() {
-        return storageImages.getTempImage();
-    }
-
-    private synchronized void switchImagesOnNextStep(Image newImage) {
-        storageImages.switchImagesOnNextStep(newImage);
-        notifyObservers(NotifyConstants.IMAGE_READY);
     }
 }
