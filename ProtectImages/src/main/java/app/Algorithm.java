@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Algorithm {
 
-    private static int SIZE_SEGMENT = 500;
+    private static int SIZE_SEGMENT = 8;
 
     public ArrayList<Mat> doSegmentation(Mat source) {
         ArrayList<Mat> matArrayList = new ArrayList<>();
@@ -60,29 +60,38 @@ public class Algorithm {
         return matArrayList;
     }
 
-    public ArrayList<Mat> doGrayscale(ArrayList<Mat> rgbSegments) {
-        ArrayList<Mat> grayscaleSegments = new ArrayList<>();
-
-        for (Mat rgbSegment : rgbSegments) {
-            //Конвертируем изображение в одноканальное
-            Mat matGray = new Mat();
-            Imgproc.cvtColor(rgbSegment, matGray, Imgproc.COLOR_BGR2GRAY);
-
-            //Перевод в бинарное изображение
-            //Mat matBinary = new Mat();
-            //Imgproc.threshold(matGray, matBinary, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
-
-            //Добавляем результат в массив
-            grayscaleSegments.add(matGray);
-        }
-        return grayscaleSegments;
+    public Mat doGrayscale(Mat rgbSegment) {
+        //Конвертируем изображение в одноканальное
+        Mat matGray = new Mat();
+        Imgproc.cvtColor(rgbSegment, matGray, Imgproc.COLOR_BGR2GRAY);
+        return matGray;
     }
 
-    public ArrayList<Integer> getHashCodeForEachSegment(ArrayList<Mat> segments) {
-        ArrayList<Integer> hashCodes = new ArrayList<>();
-        for (Mat segment : segments) {
-            //Core.dct();
-        }
-        return hashCodes;
+    public Mat doBinary (Mat graySegment) {
+        //Перевод в бинарное изображение
+        Mat matBinary = new Mat();
+        Imgproc.threshold(graySegment, matBinary, 0, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
+        return matBinary;
     }
+
+    public void doSteganography(Mat segmentBinary, Mat originalsegment) {
+        long hash = getHash(segmentBinary);
+
+    }
+
+    private long getHash(Mat m) {
+        long hash = 1125899906842597L;
+
+        byte[] arr = new byte[m.channels() * m.cols() * m.rows()];
+        m.get(0, 0, arr);
+
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == -1) arr[i] = 1;
+            hash = 31 * hash + arr[i];
+        }
+        if (hash < 0) hash = 0 - hash;
+        return hash;
+    }
+
+
 }

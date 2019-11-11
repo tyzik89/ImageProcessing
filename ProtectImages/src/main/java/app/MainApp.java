@@ -22,15 +22,19 @@ public class MainApp extends Application {
         Mat sourceMat = ImageUtils.imageFXToMat(image);
 
         Algorithm algorithm = new Algorithm();
+
         //Разбиваем изображение на сегменты
         ArrayList<Mat> segments = algorithm.doSegmentation(sourceMat);
-        //Каждый сегмент переводим в градацию серого
-        ArrayList<Mat> segmentsGray = algorithm.doGrayscale(segments);
-        //Получаем хэш-код каждого сегмента
-        ArrayList<Integer> hashCodes = algorithm.getHashCodeForEachSegment(segmentsGray);
 
-        for (Mat mat : segmentsGray) {
-            ShowImage.show(ImageUtils.matToImageFX(mat));
+        for (Mat segment : segments) {
+            //Каждый сегмент переводим в градацию серого
+            Mat segmentGray = algorithm.doGrayscale(segment);
+            //Бинаризируем сегмет
+            Mat segmentBinary = algorithm.doBinary(segmentGray);
+            //Получаем хэш-код каждого сегмента и встраиваем этот хэш код в изображение
+            algorithm.doSteganography(segmentBinary, segment);
+
+            ShowImage.show(ImageUtils.matToImageFX(segmentBinary));
         }
     }
 
