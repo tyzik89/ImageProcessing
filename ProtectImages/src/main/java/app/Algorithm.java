@@ -73,8 +73,11 @@ public class Algorithm {
 
     public void doSteganography(Mat segmentBinary, Mat originalSegment) {
         long hash = getHash(segmentBinary);
+        String bin = Long.toBinaryString(hash);
 
-        /*int red = 0, green = 0, blue = 0, r = 0, g = 0, b = 0;
+        System.out.println(bin.length());
+
+        int red = 0, green = 0, blue = 0, r = 0, g = 0, b = 0;
         byte[] bytes = new byte[originalSegment.cols() * originalSegment.rows() * originalSegment.channels()];
         originalSegment.get(0, 0, bytes);
         for (int i = 0, j = bytes.length; i < j; i+=originalSegment.channels()) {
@@ -83,7 +86,7 @@ public class Algorithm {
             b = bytes[i] & 0xFF;
             g = bytes[i + 1] & 0xFF;
             r = bytes[i + 2] & 0xFF;
-        }*/
+        }
 
         System.out.println(originalSegment.channels());
         System.out.println(originalSegment.size());
