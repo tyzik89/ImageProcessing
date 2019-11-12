@@ -20,23 +20,24 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        File file = new File("src/main/resources/img/1.png");
+        File file = new File("src/main/resources/img/nature.png");
         String localUrl = file.toURI().toString();
         Image image = new Image(localUrl);
         Mat sourceMat = ImageUtils.imageFXToMat(image);
 
-        //Вытаскиваем фрагмет 32х32 и конвертируем его в одноканальный
-        Mat subMat = sourceMat;//sourceMat.submat(0, 31, 0, 31);
-        Imgproc.cvtColor(subMat, subMat, Imgproc.COLOR_BGR2GRAY);
-        //Конвертируем в float тип
-        Mat floatSubMat = new Mat();
-        subMat.convertTo(floatSubMat, CvType.CV_32FC1);
+        int red = 0, green = 0, blue = 0, r = 0, g = 0, b = 0;
+        byte[] bytes = new byte[sourceMat.cols() * sourceMat.rows() * sourceMat.channels()];
+        sourceMat.get(0, 0, bytes);
+        for (int i = 0, j = bytes.length; i < j; i+=sourceMat.channels()) {
+            b = bytes[i] & 0xFF;
+            g = bytes[i + 1] & 0xFF;
+            r = bytes[i + 2] & 0xFF;
+            System.out.println(b + " " + g + " " + r);
 
-        //Выполянем дискретное косинусное преобразование
-        Mat resultMat = new Mat();
-        Core.dct(floatSubMat, resultMat);
-
-        ShowImage.show(ImageUtils.matToImageFX(resultMat));
+            // now, clear the least significant bit (LSB) from each pixel element
+            b = bytes[i] - bytes[i] % 2;
+            System.out.println(Integer.toBinaryString(bytes[i]));
+        }
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {

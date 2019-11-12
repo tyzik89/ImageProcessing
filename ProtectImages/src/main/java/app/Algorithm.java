@@ -1,6 +1,5 @@
 package app;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
@@ -8,16 +7,14 @@ import java.util.ArrayList;
 
 public class Algorithm {
 
-    private static int SIZE_SEGMENT = 8;
-
-    public ArrayList<Mat> doSegmentation(Mat source) {
+    public ArrayList<Mat> doSegmentation(Mat source, int sizeSegment) {
         ArrayList<Mat> matArrayList = new ArrayList<>();
 
         int width = source.cols();
         int height = source.rows();
 
         int rowStart = 0, colStart = 0;
-        int rowEnd = SIZE_SEGMENT, colEnd = SIZE_SEGMENT;
+        int rowEnd = sizeSegment, colEnd = sizeSegment;
 
         while (rowEnd < height) {
             while (colEnd < width) {
@@ -26,7 +23,7 @@ public class Algorithm {
                 matArrayList.add(resultMat);
 
                 colStart = colEnd + 1;
-                colEnd = colEnd + SIZE_SEGMENT + 1;
+                colEnd = colEnd + sizeSegment + 1;
             }
 
             colEnd = width;
@@ -35,10 +32,10 @@ public class Algorithm {
             matArrayList.add(resultMat);
 
             rowStart = rowEnd + 1;
-            rowEnd = rowEnd + SIZE_SEGMENT + 1;
+            rowEnd = rowEnd + sizeSegment + 1;
 
             colStart = 0;
-            colEnd = SIZE_SEGMENT;
+            colEnd = sizeSegment;
         }
 
         if (rowEnd >= height) {
@@ -49,7 +46,7 @@ public class Algorithm {
                 matArrayList.add(resultMat);
 
                 colStart = colEnd + 1;
-                colEnd = colEnd + SIZE_SEGMENT + 1;
+                colEnd = colEnd + sizeSegment + 1;
             }
 
             colEnd = width;
@@ -74,9 +71,23 @@ public class Algorithm {
         return matBinary;
     }
 
-    public void doSteganography(Mat segmentBinary, Mat originalsegment) {
+    public void doSteganography(Mat segmentBinary, Mat originalSegment) {
         long hash = getHash(segmentBinary);
 
+        /*int red = 0, green = 0, blue = 0, r = 0, g = 0, b = 0;
+        byte[] bytes = new byte[originalSegment.cols() * originalSegment.rows() * originalSegment.channels()];
+        originalSegment.get(0, 0, bytes);
+        for (int i = 0, j = bytes.length; i < j; i+=originalSegment.channels()) {
+            //Шеснадцатиричный литерал 0xFF равен 255
+            //Конструкция обращает все биты, кроме младших в 0
+            b = bytes[i] & 0xFF;
+            g = bytes[i + 1] & 0xFF;
+            r = bytes[i + 2] & 0xFF;
+        }*/
+
+        System.out.println(originalSegment.channels());
+        System.out.println(originalSegment.size());
+        System.out.println(originalSegment.dump());
     }
 
     private long getHash(Mat m) {
@@ -89,6 +100,7 @@ public class Algorithm {
             if (arr[i] == -1) arr[i] = 1;
             hash = 31 * hash + arr[i];
         }
+
         if (hash < 0) hash = 0 - hash;
         return hash;
     }

@@ -24,7 +24,7 @@ public class MainApp extends Application {
         Algorithm algorithm = new Algorithm();
 
         //Разбиваем изображение на сегменты
-        ArrayList<Mat> segments = algorithm.doSegmentation(sourceMat);
+        ArrayList<Mat> segments = algorithm.doSegmentation(sourceMat, 8);
 
         for (Mat segment : segments) {
             //Каждый сегмент переводим в градацию серого
@@ -34,7 +34,8 @@ public class MainApp extends Application {
             //Получаем хэш-код каждого сегмента и встраиваем этот хэш код в изображение
             algorithm.doSteganography(segmentBinary, segment);
 
-            ShowImage.show(ImageUtils.matToImageFX(segmentBinary));
+            break;
+            //ShowImage.show(ImageUtils.matToImageFX(segmentBinary));
         }
     }
 
