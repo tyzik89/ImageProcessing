@@ -1,10 +1,10 @@
-package algorithms;
+package utils;
 
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 
-public class SegmentsImageWorker {
+public class SegmentsImageUtils {
 
     /**
      * Разбиение изображения на заданные сегменты

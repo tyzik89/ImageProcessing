@@ -1,4 +1,4 @@
-package app;
+package algorithms;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
@@ -6,7 +6,8 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class Algorithm {
+@Deprecated
+public class AlgorithmTemp {
 
     public void doSteganography(Mat segmentBinary, Mat originalSegment) {
         //получаем хэш код бинарного сегмента

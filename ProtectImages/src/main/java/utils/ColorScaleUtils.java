@@ -1,9 +1,9 @@
-package algorithms;
+package utils;
 
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
-public class ColorScaleWorker {
+public class ColorScaleUtils {
 
     public static Mat doGrayscale(Mat rgbSegment) {
         //Конвертируем изображение в одноканальное
