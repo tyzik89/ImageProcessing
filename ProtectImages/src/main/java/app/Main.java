@@ -21,38 +21,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        File file = new File("src/main/resources/img/example.jpg");
-        String localUrl = file.toURI().toString();
-        Image image = new Image(localUrl);
-        Mat sourceMat = ImageUtils.imageFXToMat(image);
-        Mat grayMat = ColorScaleUtils.doGrayscale(sourceMat);
-        Mat binaryMat = ColorScaleUtils.doBinary(grayMat);
-
-/*        ShowImage.show(ImageUtils.matToImageFX(sourceMat));
-        ShowImage.show(ImageUtils.matToImageFX(grayMat));
-        ShowImage.show(ImageUtils.matToImageFX(binaryMat));*/
-
-        System.out.println(sourceMat.get(0, 0).length);
-/*        System.out.println(sourceMat.get(0, 1)[0]);
-        System.out.println(sourceMat.get(0, 2)[0]);
-        System.out.println(sourceMat.get(0, 3)[0]);
-        System.out.println(sourceMat.get(0, 4)[0]);
-        System.out.println(sourceMat.get(0, 5)[0]);
-        System.out.println(sourceMat.get(0, 6)[0]);
-        System.out.println(sourceMat.get(0, 7)[0]);*/
-
-        /*int red = 0, green = 0, blue = 0, r = 0, g = 0, b = 0;
-        byte[] bytes = new byte[sourceMat.cols() * sourceMat.rows() * sourceMat.channels()];
-        sourceMat.get(0, 0, bytes);
-        for (int i = 0, j = bytes.length; i < j; i+=sourceMat.channels()) {
-            b = bytes[i] & 0xFF;
-            g = bytes[i + 1] & 0xFF;
-            r = bytes[i + 2] & 0xFF;
-            System.out.println(b + " " + g + " " + r);
-
-            // now, clear the least significant bit (LSB) from each pixel element
-            b = bytes[i] - bytes[i] % 2;
-            System.out.println(Integer.toBinaryString(bytes[i]));*/
+        int x = 0;
+        System.out.println(Integer.toBinaryString(x));
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {

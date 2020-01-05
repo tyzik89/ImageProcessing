@@ -63,7 +63,7 @@ public class SegmentsImageUtils {
     /**
      * Соединение изображения из сегментов
      */
-    public void synthesis(ArrayList<Mat> segments, Mat originalMat) {
+    public static void synthesis(ArrayList<Mat> segments, Mat originalMat) {
         //извлекаем массив байт из оригинального изображения
         byte[] byteBufferOriginalMat = new byte[originalMat.cols() * originalMat.rows() * originalMat.channels()];
         originalMat.get(0, 0, byteBufferOriginalMat);
