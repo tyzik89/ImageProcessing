@@ -10,7 +10,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Algorithm algorithm = new BinaryAlgorithm("src/main/resources/img/figures.jpg");
+        Algorithm algorithm = new BinaryAlgorithm("src/main/resources/img/order.jpg");
         algorithm.run();
     }
 

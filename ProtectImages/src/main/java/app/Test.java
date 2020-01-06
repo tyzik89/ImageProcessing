@@ -1,7 +1,13 @@
 package app;
 
+import algorithms.Algorithm;
+import algorithms.BinaryAlgorithm;
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -17,21 +23,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class Main extends Application {
+public class Test extends Application {
+
+    private static int SIZE_SEGMENT = 8;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        int x = 0;
-        System.out.println(Integer.toBinaryString(x));
+        Algorithm algorithm = new BinaryAlgorithm("src/main/resources/img/order_new.jpg");
+        algorithm.check();
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        /*String text = "lol";
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-        String encoded = Base64.getEncoder().encodeToString(hash);
-        System.out.println(encoded);*/
-
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         launch(args);
     }

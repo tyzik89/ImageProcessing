@@ -3,6 +3,7 @@ package utils;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SegmentsImageUtils {
 
@@ -67,8 +68,9 @@ public class SegmentsImageUtils {
         //извлекаем массив байт из оригинального изображения
         byte[] byteBufferOriginalMat = new byte[originalMat.cols() * originalMat.rows() * originalMat.channels()];
         originalMat.get(0, 0, byteBufferOriginalMat);
+        System.out.println(Arrays.toString(byteBufferOriginalMat));
 
-        //текущая позиция в оригинальном массиве
+        /*//текущая позиция в оригинальном массиве
         int position = 0;
         //бежим по каждому сегменту
         for (Mat segment : segments) {
@@ -79,7 +81,7 @@ public class SegmentsImageUtils {
             for (int i = 0; i < byteBufferSegment.length; i++, position++) {
                 byteBufferOriginalMat[position] = byteBufferSegment[i];
             }
-        }
+        }*/
         //заполненный массив байт помещаем обратно в оригинальную матрицу
         originalMat.put(0, 0, byteBufferOriginalMat);
     }

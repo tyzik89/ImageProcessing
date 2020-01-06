@@ -11,11 +11,12 @@ import java.io.IOException;
 
 public abstract class Algorithm {
 
-    private static String PREFIX_FILE_NAME = "NEW_";
     private Image sourceImage;
     private Mat sourceMat;
 
     public abstract void run();
+
+    public abstract void check();
 
     public void loadImage(String pathname) {
         File file = new File(pathname);
@@ -25,8 +26,10 @@ public abstract class Algorithm {
         ShowImage.show(sourceImage);
     }
 
-    public void saveImage(Mat mat, String pathname) {
-        boolean st = Imgcodecs.imwrite(pathname, mat);
+    public void saveImage(Mat mat, String pathname, String postfix_file_name) {
+        String newName = pathname.substring(0, 28);
+        newName = newName + postfix_file_name;
+        boolean st = Imgcodecs.imwrite(newName + ".jpg", mat);
         if (!st) {
             System.out.println("Не удалось сохранить изображение");
         }

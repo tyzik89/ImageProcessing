@@ -1,21 +1,79 @@
 package algorithms;
 
+import org.opencv.core.Mat;
 import utils.ColorScaleUtils;
 import utils.ImageUtils;
 import utils.SegmentsImageUtils;
-import org.opencv.core.Mat;
 import utils.ShowImage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BinaryAlgorithm extends Algorithm {
 
     private String pathname;
-    private int sizeSegment = 151;
+    private int sizeSegment = 8;
 
     public BinaryAlgorithm(String pathname) {
         this.pathname = pathname;
+    }
+
+    @Override
+    public void check() {
+        loadImage(pathname);
+        ArrayList<Mat> segments = SegmentsImageUtils.analyze(getSourceMat(), sizeSegment);
+
+        for (Mat segment : segments) {
+            //переводим в градации серого и бинаризируем сегмент
+            Mat graySegment = ColorScaleUtils.doGrayscale(segment);
+            Mat binarySegment = ColorScaleUtils.doBinary(graySegment);
+            //Получаем хэш сегмента
+            String hash = getSimpleBinaryHash(binarySegment);
+            //System.out.println(hash);
+            //Проверяем хэш в сегменте и если если не совпадает помечаем этот сегмент
+            checkHashInSegments(hash, segment);
+        }
+
+        ShowImage.show(ImageUtils.matToImageFX(getSourceMat()));
+        saveImage(getSourceMat(), pathname, "_different");
+    }
+
+    private void checkHashInSegments(String hash, Mat segment) {
+        boolean ok = true;
+        int admission = 40;
+        String[] hashArr = hash.split("");
+        //Пробегаемся по всем пикселям оригинального сегмента
+        for (int i = 0, rows = segment.rows(), hashBit = 0; i < rows; i++) {
+            for (int j = 0, cols = segment.cols(); j < cols; j++, hashBit++) {
+                //берём пиксель
+                double[] pixel = segment.get(i, j);
+                //из пикселя берём синий канал
+                long blueChannel = (long) pixel[0];
+                //бинарное представление синего канала
+                String blueChannelBin = toBitString(blueChannel, sizeSegment);
+                //младший бит синего канала сравниваем с битом хэша
+                String bit = blueChannelBin.substring(7, 8);
+                if (!hashArr[hashBit].equals(bit)) {
+                    admission--;
+                    if (admission <= 0) {
+                        ok = false;
+                    }
+                }
+            }
+        }
+        if (!ok) {
+            for (int i = 0, rows = segment.rows(), hashBit = 0; i < rows; i++) {
+                for (int j = 0, cols = segment.cols(); j < cols; j++, hashBit++) {
+                    //берём пиксель
+                    double[] pixel = segment.get(i, j);
+                    //в массив каналов пикселя упаковываем обновленный синий канал
+                    pixel[0] = 0.0;
+                    pixel[1] = 0.0;
+                    pixel[2] = 255.0;
+                    //Засовываем пиксель обратно в сегмент
+                    segment.put(i, j, pixel);
+                }
+            }
+        }
     }
 
     @Override
@@ -29,13 +87,13 @@ public class BinaryAlgorithm extends Algorithm {
             Mat binarySegment = ColorScaleUtils.doBinary(graySegment);
             //Получаем хэш сегмента
             String hash = getSimpleBinaryHash(binarySegment);
+            //System.out.println(hash);
             //Упаковываем хэш в сегмент
             putHashInSegments(hash, segment);
         }
 
-        SegmentsImageUtils.synthesis(segments, getSourceMat());
         ShowImage.show(ImageUtils.matToImageFX(getSourceMat()));
-        //saveImage(getSourceMat(), pathname);
+        saveImage(getSourceMat(), pathname, "_new");
     }
 
     private void putHashInSegments(String hash, Mat segment) {
@@ -50,10 +108,10 @@ public class BinaryAlgorithm extends Algorithm {
                 //бинарное представление синего канала
                 String blueChannelBin = toBitString(blueChannel, sizeSegment);
                 //младший бит синего канала заменяем битом хэша
-                String newBlueChannel = blueChannelBin.substring(0, 7) + hashArr[hashBit];
-                blueChannel = Long.parseLong(newBlueChannel, 2);
+                String newBlueChannelBin = blueChannelBin.substring(0, 7) + hashArr[hashBit];
+                long newBlueChannel = Long.parseLong(newBlueChannelBin, 2);
                 //в массив каналов пикселя упаковываем обновленный синий канал
-                pixel[0] = blueChannel;
+                pixel[0] = (double) newBlueChannel;
                 //Засовываем пиксель обратно в сегмент
                 segment.put(i, j, pixel);
             }
