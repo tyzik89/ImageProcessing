@@ -6,30 +6,35 @@ import org.opencv.imgcodecs.Imgcodecs;
 import utils.ImageUtils;
 import utils.ShowImage;
 
-import java.io.File;
-import java.io.IOException;
-
 public abstract class Algorithm {
 
     private Image sourceImage;
     private Mat sourceMat;
+    private int sizeSegment;
+    private String pathname;
+    private String filename;
 
     public abstract void run();
 
     public abstract void check();
 
-    public void loadImage(String pathname) {
-        File file = new File(pathname);
-        String localUrl = file.toURI().toString();
-        sourceImage = new Image(localUrl);
-        sourceMat = ImageUtils.imageFXToMat(sourceImage);
+    public void loadImage(String pathname, String filename) {
+        sourceMat = Imgcodecs.imread(pathname + filename);
+        if (sourceMat.empty()) {
+            System.out.println("Не удалось загрузить изображение");
+            return;
+        }
+        sourceImage = ImageUtils.matToImageFX(sourceMat);
         ShowImage.show(sourceImage);
+//        File file = new File(pathname + filename);
+//        String localUrl = file.toURI().toString();
+//        sourceImage = new Image(localUrl);
+//        sourceMat = ImageUtils.imageFXToMat(sourceImage);
+//        ShowImage.show(sourceImage);
     }
 
-    public void saveImage(Mat mat, String pathname, String postfix_file_name) {
-        String newName = pathname.substring(0, 28);
-        newName = newName + postfix_file_name;
-        boolean st = Imgcodecs.imwrite(newName + ".jpg", mat);
+    public void saveImage(Mat mat, String pathname, String filename) {
+        boolean st = Imgcodecs.imwrite(pathname + filename, mat);
         if (!st) {
             System.out.println("Не удалось сохранить изображение");
         }
@@ -41,5 +46,29 @@ public abstract class Algorithm {
 
     public Mat getSourceMat() {
         return sourceMat;
+    }
+
+    public int getSizeSegment() {
+        return sizeSegment;
+    }
+
+    public void setSizeSegment(int sizeSegment) {
+        this.sizeSegment = sizeSegment;
+    }
+
+    public String getPathname() {
+        return pathname;
+    }
+
+    public void setPathname(String pathname) {
+        this.pathname = pathname;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
