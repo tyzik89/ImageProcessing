@@ -16,7 +16,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        PolygonalSegmentation polygonalSegmentation = new PolygonalSegmentationImpl("src/resources/", "test_image_4.bmp");
+        PolygonalSegmentation polygonalSegmentation = new PolygonalSegmentationImpl("src/resources/", "test_image_2.bmp");
         polygonalSegmentation.run();
     }
 }

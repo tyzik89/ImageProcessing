@@ -22,7 +22,7 @@ public class MarkersGradientComparator implements Comparator<Marker> {
         ArrayList<Point> pointListOfMarkerM2 = line(m2.getStartPoint().x, m2.getStartPoint().y, m2.getEndPoint().x, m2.getEndPoint().y);
         double gradientValueM1 = findMarkerGradient(pointListOfMarkerM1);
         double gradientValueM2 = findMarkerGradient(pointListOfMarkerM2);
-        System.out.println("gradientValueM1: " + gradientValueM1 + ", gradientValueM2: " + gradientValueM2);
+        System.out.println("gradientValueM1: " + gradientValueM1 + "\ngradientValueM2: " + gradientValueM2 + "\n");
         return Double.compare(gradientValueM1, gradientValueM2);
     }
 
@@ -30,6 +30,7 @@ public class MarkersGradientComparator implements Comparator<Marker> {
         double value = 0;
         for (Point point : pointListOfMarker) {
             double[] pixelChannels = originalMat.get((int) point.x, (int) point.y);
+//            if (pixelChannels == null) break;
             double brightnessPixel = (pixelChannels[0] + pixelChannels[1] + pixelChannels[2]) / 3;
             value += brightnessPixel;
         }
@@ -43,11 +44,6 @@ public class MarkersGradientComparator implements Comparator<Marker> {
 
     /**
      * реализация алгоритма Брезенхема
-     * @param x
-     * @param y
-     * @param x2
-     * @param y2
-     * @return
      */
     private ArrayList<Point> line(double x, double y, double x2, double y2) {
         ArrayList<Point> pointArray = new ArrayList<>();
