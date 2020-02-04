@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@Deprecated
 public class MarkersFormerTest {
 
     private Mat vectorOfLines;

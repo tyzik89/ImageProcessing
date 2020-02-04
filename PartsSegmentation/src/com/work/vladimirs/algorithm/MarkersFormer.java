@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class MarkersFormer {
 
-    private static final double distanceOfMarkers = 1.0;
+    private static final double distanceOfMarkers = 2.0;
     private static final double ratioLength = 0.2;
     private Mat vectorOfLines;
     private Mat sourceMat;
@@ -23,7 +23,7 @@ public class MarkersFormer {
 
     public Mat prepareMaskOfMarkers() {
         // Готовые маркеры
-        Mat maskOfMarkers = new Mat(sourceMat.size(), CvType.CV_32SC1, ImageUtils.COLOR_BLACK);
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32SC1, ImageUtils.COLOR_BLACK);
         Point startPointOfLine;
         Point endPointOfLine;
 
@@ -47,28 +47,37 @@ public class MarkersFormer {
                 //System.out.println(firstMarker.getStartPoint().x + " " + firstMarker.getStartPoint().y);
 
                 //Определяем тип маркера, сравнивая фон оригинального изображения
-                MarkersGradientComparator comparator = new MarkersGradientComparator(sourceMat);
-                comparator.compare(firstMarker, secondMarker);
-
-                createMaskWithMarker(firstMarker);
+                //Фон ТЕМНЕЕ, это значит что это маркер фона.
+                MarkersGradientComparator gradientComparator = new MarkersGradientComparator(sourceMat);
+                int comp = gradientComparator.compare(firstMarker, secondMarker);
+                if (comp < 0) {
+                    createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+                    createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
+                } else if (comp > 0) {
+                    createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
+                    createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+                }
             }
-            break;
         }
-        return maskOfMarkers;
+        return maskWithMarker;
     }
 
-    private Mat createMaskWithMarker(Marker m) {
+    private void createMaskWithMarker(Marker m, Mat maskWithMarker, Scalar color) {
+        //fixme Тип матрицы поменял на 32-х битную
         //Маска с маркером
-        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        //Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32SC1, ImageUtils.COLOR_BLACK);
         Imgproc.line(
                 maskWithMarker,
                 m.getStartPoint(),
                 m.getEndPoint(),
-                ImageUtils.COLOR_WHITE,
+                color,
                 1,
                 4);
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarker), "Mask with marker");
-        return maskWithMarker;
+
+        /* //Отрисовка отдельного маркера
+        Mat markers = new Mat();
+        maskWithMarker.convertTo(markers, CvType.CV_8U);
+        ShowImage.show(ImageUtils.matToImageFX(markers), "Mask with marker");*/
     }
 
     private void reduceMarkerLength(Marker m, double ratio) {
