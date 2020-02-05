@@ -35,6 +35,9 @@ public class MarkersFormer {
                 startPointOfLine = new Point(line[0], line[1]);
                 endPointOfLine = new Point(line[2], line[3]);
 
+                //Проверяем линию на "надёжность"
+                if (!LineValidator.validateLine(startPointOfLine, endPointOfLine)) continue;
+
                 Marker firstMarker = new Marker();
                 Marker secondMarker = new Marker();
                 //Находим параллельные маркеры для этой линии на определенном растоянии от линии
