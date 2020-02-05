@@ -51,16 +51,12 @@ public class HoughConversionAlgorithm implements Algorithm {
     }
 
     @Override
-    public Mat doAlgorithm(Mat frame) {
-
-        //Конвертируем изображение в одноканальное
-        Mat matGray = new Mat();
-        Imgproc.cvtColor(frame, matGray, Imgproc.COLOR_BGR2GRAY);
+    public Mat doAlgorithm(Mat matGray) {
 
         //Вектор, который будет хранить параметры (r, θ) обнаруженных линий
         Mat lines = new Mat();
         //Результирующая матрица
-        Mat result = new Mat(frame.size(), CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
+        Mat result = new Mat(matGray.size(), CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
 
         if (typeHoughMethodClassic) {
 

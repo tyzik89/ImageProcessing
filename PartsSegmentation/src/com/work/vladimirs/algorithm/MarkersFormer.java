@@ -11,7 +11,7 @@ import org.opencv.imgproc.Imgproc;
 
 public class MarkersFormer {
 
-    private static final double distanceOfMarkers = 8.0;
+    private static final double distanceOfMarkers = 5.0;
     private static final double ratioLength = 0.2;
     private Mat vectorOfLines;
     private Mat sourceMat;
@@ -40,9 +40,16 @@ public class MarkersFormer {
                 //Находим параллельные маркеры для этой линии на определенном растоянии от линии
                 findParallelMarkers(startPointOfLine, endPointOfLine, firstMarker, secondMarker, distanceOfMarkers);
 
+                System.out.println("Граница: " + "start:{" + startPointOfLine.x + "," + startPointOfLine.y + "}," + " end:{" + endPointOfLine.x + "," + endPointOfLine.y + "}");
+                System.out.println("Маркер_1: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
+                System.out.println("Маркер_2: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
+
                 //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
                 reduceMarkerLength(firstMarker, ratioLength);
                 reduceMarkerLength(secondMarker, ratioLength);
+
+                System.out.println("Маркер_1_reduce: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
+                System.out.println("Маркер_2_reduce: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
 
                 //Определяем тип маркера, сравнивая фон оригинального изображения
                 //Фон ТЕМНЕЕ, это значит что это маркер фона.
