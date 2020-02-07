@@ -1,6 +1,6 @@
 package com.work.vladimirs.algorithm;
 
-import com.work.vladimirs.algorithm.entities.Marker;
+import com.work.vladimirs.algorithm.entities.Line;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class MarkersGradientComparator implements Comparator<Marker> {
+public class MarkersGradientComparator implements Comparator<Line> {
 
     private static final double EPSILON = 0.0001;
     private Mat originalMat;
@@ -18,14 +18,18 @@ public class MarkersGradientComparator implements Comparator<Marker> {
     }
 
     @Override
-    public int compare(Marker m1, Marker m2) {
+    public int compare(Line m1, Line m2) {
         ArrayList<Point> pointListOfMarkerM1 = generateSetPointsBetweenTwoPoints(m1.getStartPoint().x, m1.getStartPoint().y, m1.getEndPoint().x, m1.getEndPoint().y);
         ArrayList<Point> pointListOfMarkerM2 = generateSetPointsBetweenTwoPoints(m2.getStartPoint().x, m2.getStartPoint().y, m2.getEndPoint().x, m2.getEndPoint().y);
+
         System.out.println("pointListOfMarkerM1: " + pointListOfMarkerM1.toString());
         System.out.println("pointListOfMarkerM2: " + pointListOfMarkerM2.toString());
+
         double gradientValueM1 = findMarkerGradient(pointListOfMarkerM1);
         double gradientValueM2 = findMarkerGradient(pointListOfMarkerM2);
+
         System.out.println("gradientValueM1: " + gradientValueM1 + "\ngradientValueM2: " + gradientValueM2 + "\n");
+
         return Double.compare(gradientValueM1, gradientValueM2);
     }
 
@@ -33,7 +37,9 @@ public class MarkersGradientComparator implements Comparator<Marker> {
         double value = 0;
         for (Point point : pointListOfMarker) {
             double[] pixelChannels = originalMat.get((int) point.x, (int) point.y);
-            System.out.println("{" + (int) point.x + ", " + (int) point.y + "}: " + Arrays.toString(pixelChannels));
+
+//            System.out.println("{" + (int) point.x + ", " + (int) point.y + "}: " + Arrays.toString(pixelChannels));
+
 //            if (pixelChannels == null) break;
             double brightnessPixel = (pixelChannels[0] + pixelChannels[1] + pixelChannels[2]) / 3;
             value += brightnessPixel;
@@ -49,6 +55,7 @@ public class MarkersGradientComparator implements Comparator<Marker> {
     /**
      * реализация алгоритма Брезенхема
      */
+    //fixme поправить этот алгоритм тут и в #ShowImage
     private ArrayList<Point> generateSetPointsBetweenTwoPoints(double x, double y, double x2, double y2) {
         ArrayList<Point> pointArray = new ArrayList<>();
         double w = x2 - x ;

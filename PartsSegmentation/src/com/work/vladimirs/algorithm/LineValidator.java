@@ -1,12 +1,18 @@
 package com.work.vladimirs.algorithm;
 
+import com.work.vladimirs.algorithm.entities.Line;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
 
 public class LineValidator {
 
-    public static boolean validateLine(Point p1, Point p2) {
+    public static boolean validateLineLength(Line currentLine) {
+        Point p1 = currentLine.getStartPoint();
+        Point p2 = currentLine.getEndPoint();
+        ArrayList<Point> pointArrayList = generateSetPointsBetweenTwoPoints(p1.x, p1.y, p2.x, p2.y);
+//        if (pointArrayList.size() < 40) {
+//            System.out.println("FALSE!!!"); return false;}
 
         return true;
     }

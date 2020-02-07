@@ -1,17 +1,16 @@
 package com.work.vladimirs.algorithm;
 
-import com.work.vladimirs.algorithm.entities.Marker;
+import com.work.vladimirs.algorithm.entities.Line;
 import com.work.vladimirs.utils.ImageUtils;
 import com.work.vladimirs.utils.ShowImage;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
 
 public class MarkersFormer {
 
-    private static final double distanceOfMarkers = 5.0;
+    private static final double distanceOfMarkers = 2.0;
     private static final double ratioLength = 0.2;
     private Mat vectorOfLines;
     private Mat sourceMat;
@@ -22,28 +21,27 @@ public class MarkersFormer {
     }
 
     public Mat prepareMaskOfMarkers() {
-        // Готовые маркеры
-        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32SC1, ImageUtils.COLOR_BLACK);
-        Point startPointOfLine;
-        Point endPointOfLine;
+        // Создание маркерного изображения для алгоритма водоразделов
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        Line currentLine;
 
         //Бежим по всем найденным линиям
         for (int i = 0, r = vectorOfLines.rows(); i < r; i++) {
             for (int j = 0, c = vectorOfLines.cols(); j < c; j++) {
                 //получаем координаты начальной и конечной точек линии
                 double[] line = vectorOfLines.get(i, j);
-                startPointOfLine = new Point(line[0], line[1]);
-                endPointOfLine = new Point(line[2], line[3]);
+                currentLine = new Line(new Point(line[0], line[1]), new Point(line[2], line[3]));
+                ShowImage.drawPointsBetweenTwoPoints(sourceMat, currentLine.getStartPoint().x, currentLine.getStartPoint().y, currentLine.getEndPoint().x, currentLine.getEndPoint().y, new double[]{255, 0, 0});
 
-                //Проверяем линию на "надёжность"
-                if (!LineValidator.validateLine(startPointOfLine, endPointOfLine)) continue;
+                //Проверяем линию на "надёжность" по длинне
+                if (!LineValidator.validateLineLength(currentLine)) continue;
 
-                Marker firstMarker = new Marker();
-                Marker secondMarker = new Marker();
-                //Находим параллельные маркеры для этой линии на определенном растоянии от линии
-                findParallelMarkers(startPointOfLine, endPointOfLine, firstMarker, secondMarker, distanceOfMarkers);
+                Line firstMarker = new Line();
+                Line secondMarker = new Line();
+                //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
+                findParallelMarkers(currentLine, firstMarker, secondMarker, distanceOfMarkers);
 
-                System.out.println("Граница: " + "start:{" + startPointOfLine.x + "," + startPointOfLine.y + "}," + " end:{" + endPointOfLine.x + "," + endPointOfLine.y + "}");
+                System.out.println("Исходная линия: " + "start:{" + currentLine.getStartPoint().x + "," + currentLine.getStartPoint().y + "}," + " end:{" + currentLine.getEndPoint().x + "," + currentLine.getEndPoint().y + "}");
                 System.out.println("Маркер_1: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
                 System.out.println("Маркер_2: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
 
@@ -54,7 +52,11 @@ public class MarkersFormer {
                 System.out.println("Маркер_1_reduce: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
                 System.out.println("Маркер_2_reduce: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
 
-                //Определяем тип маркера, сравнивая фон оригинального изображения
+                ShowImage.drawPointsBetweenTwoPoints(sourceMat, firstMarker.getStartPoint().x, firstMarker.getStartPoint().y, firstMarker.getEndPoint().x, firstMarker.getEndPoint().y, new double[]{0, 0, 255});
+                ShowImage.drawPointsBetweenTwoPoints(sourceMat, secondMarker.getStartPoint().x, secondMarker.getStartPoint().y, secondMarker.getEndPoint().x, secondMarker.getEndPoint().y, new double[]{0, 0, 255});
+                ShowImage.show(ImageUtils.matToImageFX(sourceMat), "LINES");
+
+                /*//Определяем тип маркера, сравнивая фон оригинального изображения
                 //Фон ТЕМНЕЕ, это значит что это маркер фона.
                 MarkersGradientComparator gradientComparator = new MarkersGradientComparator(sourceMat);
                 int comp = gradientComparator.compare(firstMarker, secondMarker);
@@ -64,16 +66,16 @@ public class MarkersFormer {
                 } else if (comp > 0) {
                     createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
                     createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
-                }
+                }*/
             }
         }
         return maskWithMarker;
     }
 
-    private void createMaskWithMarker(Marker m, Mat maskWithMarker, Scalar color) {
+    private void createMaskWithMarker(Line m, Mat maskWithMarker, Scalar color) {
         //fixme Тип матрицы поменял на 32-х битную
-        //Маска с маркером
-        //Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32SC1, ImageUtils.COLOR_BLACK);
+        // Рисуем маркеры
+        Mat imageWithMarker = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         Imgproc.line(
                 maskWithMarker,
                 m.getStartPoint(),
@@ -82,13 +84,24 @@ public class MarkersFormer {
                 1,
                 4);
 
+        // Находим контуры маркеров
+        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+        Imgproc.findContours(imageWithMarker, contours, new Mat(),
+                Imgproc.RETR_CCOMP,
+                Imgproc.CHAIN_APPROX_SIMPLE);
+
+        // Отрисовываем контуры нужным цветом
+        for (int i = 0; i < contours.size(); i++) {
+            Imgproc.drawContours(maskWithMarker, contours, i, color, 1);
+        }
+
          //Отрисовка отдельного маркера
 //        Mat markers = new Mat();
 //        maskWithMarker.convertTo(markers, CvType.CV_8U);
 //        ShowImage.show(ImageUtils.matToImageFX(markers), "Mask with marker");
     }
 
-    private void reduceMarkerLength(Marker m, double ratio) {
+    private void reduceMarkerLength(Line m, double ratio) {
         Point start = m.getStartPoint();
         Point end = m.getEndPoint();
 
@@ -106,7 +119,10 @@ public class MarkersFormer {
         m.setEndPoint(new Point(newEnd));
     }
 
-    private void findParallelMarkers(Point lineStart, Point lineEnd, Marker m1, Marker m2, double distance) {
+    private void findParallelMarkers(Line currentLine, Line m1, Line m2, double distance) {
+        Point lineStart = currentLine.getStartPoint();
+        Point lineEnd = currentLine.getEndPoint();
+
         double delta_x = lineEnd.x - lineStart.x;
         double delta_y = lineEnd.y - lineStart.y;
         double lineLength = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
