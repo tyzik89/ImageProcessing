@@ -92,21 +92,18 @@ public class HoughConversionAlgorithm implements Algorithm {
             for (int i = 0, r = lines.rows(); i < r; i++) {
                 for (int j = 0, c = lines.cols(); j < c; j++) {
                     double[] line = lines.get(i, j);
-//                    System.out.println("Линия Хафа: " + "start:{" + line[0] + "," + line[1] + "}," + " end:{" + line[2] + "," + line[3] + "}");
-                    ShowImage.drawPointsBetweenTwoPoints(result, line[0], line[1], line[2], line[3], new double[]{255, 0, 0});
                     Imgproc.line(
                             result,
                             new Point(line[0], line[1]),
                             new Point(line[2], line[3]),
                             ImageUtils.COLOR_RED,
                             1,
-                            8);
+                            4);
+//                    ShowImage.drawPointsBetweenTwoPoints(result, line[0], line[1], line[2], line[3], new double[]{255, 0, 0});
+//                    ShowImage.show(ImageUtils.matToImageFX(result), "HoughLines");
                 }
             }
         }
-
-        ShowImage.show(ImageUtils.matToImageFX(result), "Hough");
-
         //Возврат линии отдельно, для последующего использования
         return lines;
 

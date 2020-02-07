@@ -39,7 +39,6 @@ public class ShowImage {
         stage.show();
     }
 
-    //fixme поправить этот алгоритм тут и в #MarkersGradient
     public static void drawPointsBetweenTwoPoints(Mat m, int xstart, int ystart, int xend, int yend, double[] color) {
 
         int x, y, dx, dy, incx, incy, pdx, pdy, es, el, err;
@@ -85,6 +84,15 @@ public class ShowImage {
         y = ystart;
         err = el/2;
         m.put(x, y, color);//ставим первую точку
+        m.put(x+1, y+1, color);//ставим первую точку
+        m.put(x-1, y-1, color);//ставим первую точку
+        m.put(x+1, y-1, color);//ставим первую точку
+        m.put(x-1, y+1, color);//ставим первую точку
+
+        m.put(x+1, y, color);//ставим первую точку
+        m.put(x-1, y, color);//ставим первую точку
+        m.put(x, y-1, color);//ставим первую точку
+        m.put(x, y+1, color);//ставим первую точку
         //все последующие точки возможно надо сдвигать, поэтому первую ставим вне цикла
 
         for (int t = 0; t < el; t++)//идём по всем точкам, начиная со второй и до последней
@@ -111,41 +119,7 @@ public class ShowImage {
         //возвращает 0, если аргумент (x) равен нулю; -1, если x < 0 и 1, если x > 0.
     }
 
-    //fixme поправить этот алгоритм тут и в #MarkersGradient
     public static void drawPointsBetweenTwoPoints(Mat m, double xstart, double ystart, double xend, double yend, double[] color) {
         drawPointsBetweenTwoPoints(m, (int)xstart, (int)ystart, (int)xend, (int)yend, color);
     }
 }
-
-
-/*
-    //fixme поправить этот алгоритм тут и в #MarkersGradient
-    public static void drawPointsBetweenTwoPoints(Mat m, double x, double y, double x2, double y2, double[] color) {
-        double w = x2 - x ;
-        double h = y2 - y ;
-        double dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0 ;
-        if (w<0) dx1 = -1 ; else if (w>0) dx1 = 1 ;
-        if (h<0) dy1 = -1 ; else if (h>0) dy1 = 1 ;
-        if (w<0) dx2 = -1 ; else if (w>0) dx2 = 1 ;
-        int longest = (int) Math.abs(w) ;
-        int shortest = (int) Math.abs(h) ;
-        if (!(longest>shortest)) {
-            longest = (int) Math.abs(h) ;
-            shortest = (int) Math.abs(w) ;
-            if (h<0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
-            dx2 = 0 ;
-        }
-        int numerator = longest >> 1 ;
-        for (int i=0;i<=longest;i++) {
-            m.put((int) x ,(int) y, color);
-            numerator += shortest ;
-            if (!(numerator<longest)) {
-                numerator -= longest ;
-                x += dx1 ;
-                y += dy1 ;
-            } else {
-                x += dx2 ;
-                y += dy2 ;
-            }
-        }
-    }*/

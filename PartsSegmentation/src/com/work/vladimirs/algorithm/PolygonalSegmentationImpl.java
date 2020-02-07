@@ -18,7 +18,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
     public PolygonalSegmentationImpl() {
         setPathname("src/resources/");
-        setFilename("test_image_2.bmp");
+        setFilename("test_image_5.bmp");
     }
 
 
@@ -40,13 +40,13 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
         //Класс формирующий маску с маркерами.
         MarkersFormer markersFormer = new MarkersFormer(vectorOfLines, getSourceMat());
         Mat maskOfMarkers = markersFormer.prepareMaskOfMarkers();
-//        //отображаем все маркеры на картинке
-//        showMarkersWithContours(maskOfMarkers, vectorOfLines);
-//
-//        //Методом водоразделов выделяем сегменты
-//        algorithm = new WatershedSegmentation(maskOfMarkers);
-//        Mat result = algorithm.doAlgorithm(getSourceMat());
-//        ShowImage.show(ImageUtils.matToImageFX(result), "Watershed");
+        //отображаем все маркеры на картинке
+        showMarkersWithContours(maskOfMarkers, vectorOfLines);
+
+        //Методом водоразделов выделяем сегменты
+        algorithm = new WatershedSegmentation(maskOfMarkers);
+        Mat result = algorithm.doAlgorithm(getSourceMat());
+        ShowImage.show(ImageUtils.matToImageFX(result), "Watershed");
     }
 
     private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfLines) {

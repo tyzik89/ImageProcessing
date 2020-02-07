@@ -30,8 +30,8 @@ public class MarkersFormer {
             for (int j = 0, c = vectorOfLines.cols(); j < c; j++) {
                 //получаем координаты начальной и конечной точек линии
                 double[] line = vectorOfLines.get(i, j);
-                currentLine = new Line(new Point(line[0], line[1]), new Point(line[2], line[3]));
-                ShowImage.drawPointsBetweenTwoPoints(sourceMat, currentLine.getStartPoint().x, currentLine.getStartPoint().y, currentLine.getEndPoint().x, currentLine.getEndPoint().y, new double[]{255, 0, 0});
+                //todo ВНИМАНИЕ! ИНВЕРТИРУЕМ ОСИ КООРДИНАТ!
+                currentLine = new Line(new Point(line[1], line[0]), new Point(line[3], line[2]));
 
                 //Проверяем линию на "надёжность" по длинне
                 if (!LineValidator.validateLineLength(currentLine)) continue;
@@ -41,22 +41,23 @@ public class MarkersFormer {
                 //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
                 findParallelMarkers(currentLine, firstMarker, secondMarker, distanceOfMarkers);
 
-                System.out.println("Исходная линия: " + "start:{" + currentLine.getStartPoint().x + "," + currentLine.getStartPoint().y + "}," + " end:{" + currentLine.getEndPoint().x + "," + currentLine.getEndPoint().y + "}");
-                System.out.println("Маркер_1: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
-                System.out.println("Маркер_2: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
+//                System.out.println("Исходная линия: " + "start:{" + currentLine.getStartPoint().x + "," + currentLine.getStartPoint().y + "}," + " end:{" + currentLine.getEndPoint().x + "," + currentLine.getEndPoint().y + "}");
+//                System.out.println("Маркер_1: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
+//                System.out.println("Маркер_2: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
 
                 //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
                 reduceMarkerLength(firstMarker, ratioLength);
                 reduceMarkerLength(secondMarker, ratioLength);
 
-                System.out.println("Маркер_1_reduce: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
-                System.out.println("Маркер_2_reduce: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
+//                System.out.println("Маркер_1_reduce: " + "start:{" + firstMarker.getStartPoint().x + "," + firstMarker.getStartPoint().y + "}," + " end:{" + firstMarker.getEndPoint().x + "," + firstMarker.getEndPoint().y + "}");
+//                System.out.println("Маркер_2_reduce: " + "start:{" + secondMarker.getStartPoint().x + "," + secondMarker.getStartPoint().y + "}," + " end:{" + secondMarker.getEndPoint().x + "," + secondMarker.getEndPoint().y + "}");
 
-                ShowImage.drawPointsBetweenTwoPoints(sourceMat, firstMarker.getStartPoint().x, firstMarker.getStartPoint().y, firstMarker.getEndPoint().x, firstMarker.getEndPoint().y, new double[]{0, 0, 255});
-                ShowImage.drawPointsBetweenTwoPoints(sourceMat, secondMarker.getStartPoint().x, secondMarker.getStartPoint().y, secondMarker.getEndPoint().x, secondMarker.getEndPoint().y, new double[]{0, 0, 255});
-                ShowImage.show(ImageUtils.matToImageFX(sourceMat), "LINES");
+//                ShowImage.drawPointsBetweenTwoPoints(sourceMat, currentLine.getStartPoint().x, currentLine.getStartPoint().y, currentLine.getEndPoint().x, currentLine.getEndPoint().y, new double[]{255, 0, 0});
+//                ShowImage.drawPointsBetweenTwoPoints(sourceMat, firstMarker.getStartPoint().x, firstMarker.getStartPoint().y, firstMarker.getEndPoint().x, firstMarker.getEndPoint().y, new double[]{0, 0, 255});
+//                ShowImage.drawPointsBetweenTwoPoints(sourceMat, secondMarker.getStartPoint().x, secondMarker.getStartPoint().y, secondMarker.getEndPoint().x, secondMarker.getEndPoint().y, new double[]{0, 0, 255});
+//                ShowImage.show(ImageUtils.matToImageFX(sourceMat), "LINES");
 
-                /*//Определяем тип маркера, сравнивая фон оригинального изображения
+                //Определяем тип маркера, сравнивая фон оригинального изображения
                 //Фон ТЕМНЕЕ, это значит что это маркер фона.
                 MarkersGradientComparator gradientComparator = new MarkersGradientComparator(sourceMat);
                 int comp = gradientComparator.compare(firstMarker, secondMarker);
@@ -66,7 +67,7 @@ public class MarkersFormer {
                 } else if (comp > 0) {
                     createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
                     createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
-                }*/
+                }
             }
         }
         return maskWithMarker;
@@ -74,17 +75,21 @@ public class MarkersFormer {
 
     private void createMaskWithMarker(Line m, Mat maskWithMarker, Scalar color) {
         //fixme Тип матрицы поменял на 32-х битную
+        // todo ВНИМАНИЕ! РЕ_ИНВЕРТИРУЕМ ОСИ КООРДИНАТ!
         // Рисуем маркеры
-        Mat imageWithMarker = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        Point invert_start = new Point(m.getStartPoint().y, m.getStartPoint().x);
+        Point invert_end = new Point(m.getEndPoint().y, m.getEndPoint().x);
+
+        //Mat imageWithMarker = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         Imgproc.line(
                 maskWithMarker,
-                m.getStartPoint(),
-                m.getEndPoint(),
+                invert_start,
+                invert_end,
                 color,
                 1,
                 4);
 
-        // Находим контуры маркеров
+/*        // Находим контуры маркеров
         ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(imageWithMarker, contours, new Mat(),
                 Imgproc.RETR_CCOMP,
@@ -93,7 +98,7 @@ public class MarkersFormer {
         // Отрисовываем контуры нужным цветом
         for (int i = 0; i < contours.size(); i++) {
             Imgproc.drawContours(maskWithMarker, contours, i, color, 1);
-        }
+        }*/
 
          //Отрисовка отдельного маркера
 //        Mat markers = new Mat();
