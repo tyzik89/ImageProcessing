@@ -33,7 +33,7 @@ public class MarkersFormer {
                 //todo ВНИМАНИЕ! ИНВЕРТИРУЕМ ОСИ КООРДИНАТ!
                 currentLine = new Line(new Point(line[1], line[0]), new Point(line[3], line[2]));
 
-                //Проверяем линию на "надёжность" по длинне
+                //Проверяем линию на "надёжность" по длине
                 if (!LineValidator.validateLineLength(currentLine)) continue;
 
                 Line firstMarker = new Line();
