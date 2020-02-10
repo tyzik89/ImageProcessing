@@ -10,6 +10,7 @@ import models.algorithms.Algorithm;
 import models.algorithms.*;
 import models.notifications.Observable;
 import models.notifications.Observer;
+import models.services.MarkersFormer;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -174,17 +175,46 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new WatershedSegmentation(markers));
     }
 
-    public void doWatershedSegmentationAutoMode() {
-        Mat detectedLines = StorageMatrix.getInstance().getMatrixOfLines();
-        Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
-
-
-
-//        storageImages.setTempImage(ImageUtils.matToImageFX());
-//        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
-    }
-
     public void doMakeBlur(int sizeGaussFilter) {
         doMakeAlgorithm(new GaussBlurAlgorithm(sizeGaussFilter));
+    }
+
+    public void doWatershedSegmentationAutoMode() {
+        Mat vectorOfLines = StorageMatrix.getInstance().getMatrixOfLines();
+        Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
+
+        double distanceOfMarkers = 2.0;
+        double ratioLength = 0.2;
+
+        MarkersFormer markersFormer = new MarkersFormer(vectorOfLines, matCurr, distanceOfMarkers, ratioLength);
+        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkers();
+        //отображаем все маркеры на экране
+        showMarkersWithContours(maskOfMarkers, vectorOfLines, matCurr);
+
+        //Методом водоразделов выделяем сегменты
+        doMakeAlgorithm(new WatershedSegmentation(maskOfMarkers));
+    }
+
+    private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfLines, Mat sourceMat) {
+        Mat markers = new Mat();
+        maskOfMarkers.convertTo(markers, CvType.CV_8UC1);
+        //ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
+        //Результирующая матрица
+        Mat result = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        for (int i = 0, r = vectorOfLines.rows(); i < r; i++) {
+            for (int j = 0, c = vectorOfLines.cols(); j < c; j++) {
+                double[] line = vectorOfLines.get(i, j);
+                Imgproc.line(
+                        result,
+                        new Point(line[0], line[1]),
+                        new Point(line[2], line[3]),
+                        new Scalar(80, 80, 80),
+                        1,
+                        4);
+            }
+        }
+        markers.copyTo(result, markers);
+        storageImages.setTempImage(ImageUtils.matToImageFX(result));
+        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
     }
 }
