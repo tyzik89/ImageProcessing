@@ -162,7 +162,7 @@ public class ImagesHandler implements Observable {
             }
 
             // Находим контуры маркеров
-            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            ArrayList<MatOfPoint> contours = new ArrayList<>();
             Imgproc.findContours(mask, contours, new Mat(),
                     Imgproc.RETR_CCOMP,
                     Imgproc.CHAIN_APPROX_SIMPLE);
@@ -173,7 +173,7 @@ public class ImagesHandler implements Observable {
             }
         }
 
-        doMakeAlgorithm(new WatershedSegmentation(markers));
+        doMakeAlgorithm(new WatershedSegmentation(markers, matCurr));
     }
 
     public void doWatershedSegmentationAutoMode() {
@@ -189,7 +189,7 @@ public class ImagesHandler implements Observable {
         showMarkersWithContours(maskOfMarkers, vectorOfLines, matCurr);
 
         //Методом водоразделов выделяем сегменты
-        doMakeAlgorithm(new WatershedSegmentation(maskOfMarkers));
+        doMakeAlgorithm(new WatershedSegmentation(maskOfMarkers, matCurr));
     }
 
     private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfLines, Mat sourceMat) {

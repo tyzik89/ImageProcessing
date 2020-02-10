@@ -15,9 +15,11 @@ public class WatershedSegmentation implements Algorithm {
 
     //Матрица с маркерами
     private Mat markers;
+    private Mat currentMat;
 
-    public WatershedSegmentation(Mat markers) {
+    public WatershedSegmentation(Mat markers, Mat currentMat) {
         this.markers = markers;
+        this.currentMat = currentMat;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class WatershedSegmentation implements Algorithm {
 
         //Преобразовываем матрицу в 3-х канальную, 8-битовую
         Mat frame8SC3 = new Mat();
-        Imgproc.cvtColor(frame, frame8SC3, Imgproc.COLOR_BGRA2BGR);
+        Imgproc.cvtColor(currentMat, frame8SC3, Imgproc.COLOR_BGRA2BGR);
 
         //Применяем алгоритм водоразделов
         Imgproc.watershed(frame8SC3, markers);
