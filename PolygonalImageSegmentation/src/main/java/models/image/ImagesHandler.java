@@ -126,6 +126,10 @@ public class ImagesHandler implements Observable {
 
     /*====================================================================================================================*/
 
+    public void doMakeBlur(int sizeGaussFilter) {
+        doMakeAlgorithm(new GaussBlurAlgorithm(sizeGaussFilter));
+    }
+
     public void doMakeBinary(int threshold, boolean isOtsu) {
         doMakeAlgorithm(new BinaryImageAlgorithm(threshold, isOtsu));
     }
@@ -169,14 +173,7 @@ public class ImagesHandler implements Observable {
             }
         }
 
-//        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
-//        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
-
         doMakeAlgorithm(new WatershedSegmentation(markers));
-    }
-
-    public void doMakeBlur(int sizeGaussFilter) {
-        doMakeAlgorithm(new GaussBlurAlgorithm(sizeGaussFilter));
     }
 
     public void doWatershedSegmentationAutoMode() {
