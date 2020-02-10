@@ -89,6 +89,8 @@ public class HoughConversionAlgorithm implements Algorithm {
 
                 Point pt1 = new Point(x0 + 1000 * (-sinTheta), y0 + 1000 * cosTheta);
                 Point pt2 = new Point(x0 - 1000 * (-sinTheta), y0 - 1000 * cosTheta);
+
+                //Отрисовка линий
                 Imgproc.line(
                         result,
                         pt1,
@@ -104,6 +106,7 @@ public class HoughConversionAlgorithm implements Algorithm {
                     distance, Math.toRadians(angle), threshold, minLineLength, maxLineGap);
 
             Imgproc.HoughLinesP(matGray, lines, distance, Math.toRadians(angle), threshold, minLineLength, maxLineGap);
+            //Отрисовка линий
             for (int i = 0, r = lines.rows(); i < r; i++) {
                 for (int j = 0, c = lines.cols(); j < c; j++) {
                     double[] line = lines.get(i, j);

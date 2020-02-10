@@ -68,13 +68,13 @@ public class CannyEdgeDetectorAlgorithm implements Algorithm{
 
         Imgproc.Canny(detectedEdgesMat, detectedEdgesMat, threshold,threshold * 3, apertureSize, needToUseL2Gradient);
 
-        //Используя результат Кэнни в качестве маски - выводим результат
+        /*//Используя результат Кэнни в качестве маски - выводим результат
         //Создаём матрицу
         Mat dest = new Mat();
         //Заполняем её нулями. Получаем совершенно чёрное изображение
         Core.add(dest, Scalar.all(0), dest);
-        frame.copyTo(dest, detectedEdgesMat);
+        frame.copyTo(dest, detectedEdgesMat);*/
 
-        return dest;
+        return detectedEdgesMat;
     }
 }

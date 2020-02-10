@@ -1,4 +1,4 @@
-package constants;
+package models.notifications.constants;
 
 public class NotifyConstants {
 

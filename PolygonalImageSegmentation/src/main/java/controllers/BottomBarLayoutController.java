@@ -1,6 +1,6 @@
 package controllers;
 
-import constants.NotifyConstants;
+import models.notifications.constants.NotifyConstants;
 import fxelements.SingletonProcess;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import models.image.ImagesHandler;
-import models.notification.Observer;
+import models.notifications.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

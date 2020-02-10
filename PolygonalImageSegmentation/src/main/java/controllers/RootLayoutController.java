@@ -35,7 +35,6 @@ public class RootLayoutController {
     //Ref on model class - ImagesHandler
     private ImagesHandler imagesHandler;
 
-
     @FXML
     private MenuItem itmLoad;
     @FXML
@@ -44,7 +43,7 @@ public class RootLayoutController {
 
     public RootLayoutController() {
         // контролер должен знать модель
-        // в модели все вычисления и внутренние данные
+        // В самой модели все вычисления и внутренние данные
         this.imagesHandler = new ImagesHandler();
     }
 
@@ -54,7 +53,7 @@ public class RootLayoutController {
     }
 
     public void initializeOtherElements() {
-        // Загрузчик макетов из fxml файла.
+        // Создаёём загрузчик макетов из fxml файла.
         FXMLLoader loader = new FXMLLoader();
         //Загружаем слой, отображающий изображение
         loader.setLocation(MainApp.class.getResource("/fxml/ImageViewLayout.fxml"));
@@ -77,7 +76,7 @@ public class RootLayoutController {
             e.printStackTrace();
         }
 
-        // Загрузчик макетов из fxml файла.
+        // Очищаем загрузчик макетов из fxml файла от предыдущего шага
         loader = new FXMLLoader();
         //Загружаем слой, отображающий нижнюю панель с прогресбаром и кнопками отмены/возврата
         loader.setLocation(MainApp.class.getResource("/fxml/BottomBarLayout.fxml"));
@@ -100,7 +99,7 @@ public class RootLayoutController {
             e.printStackTrace();
         }
 
-        // Загрузчик макетов из fxml файла.
+        // Очищаем загрузчик макетов из fxml файла от предыдущего шага
         loader = new FXMLLoader();
         //Загружаем слой, отображающий панель с алгоритмами
         loader.setLocation(MainApp.class.getResource("/fxml/AlgorithmMenuLayout.fxml"));
@@ -154,7 +153,7 @@ public class RootLayoutController {
     }
 
     @FXML
-    private void handleSourceImage(ActionEvent event) {
+    private void handleShowImage(ActionEvent event) {
         MenuItem menuItem = (MenuItem) event.getSource();
         String type = menuItem.getUserData().toString();
 

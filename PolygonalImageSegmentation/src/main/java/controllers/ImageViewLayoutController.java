@@ -1,10 +1,10 @@
 package controllers;
 
-import constants.NotifyConstants;
+import models.notifications.constants.NotifyConstants;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import models.image.ImagesHandler;
-import models.notification.Observer;
+import models.notifications.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.JavaFXUtils;

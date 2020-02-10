@@ -1,6 +1,6 @@
 package controllers;
 
-import constants.NotifyConstants;
+import models.notifications.constants.NotifyConstants;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -13,13 +13,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.image.ImagesHandler;
-import models.image.StorageMatrix;
-import models.notification.Observer;
+import models.notifications.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -367,6 +365,6 @@ public class AlgorithmMenuLayoutController implements Observer {
     }
 
     private void autoHandleWatershed() {
-        imagesHandler.doWatershedSegmentationAutoMode(StorageMatrix.getInstance().getMatrixOfLines());
+        imagesHandler.doWatershedSegmentationAutoMode();
     }
 }

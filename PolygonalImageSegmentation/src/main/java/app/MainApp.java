@@ -17,7 +17,7 @@ public class MainApp extends Application {
     private BorderPane rootLayout;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage){
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Polygonal Image Segmentation");
 
@@ -55,7 +55,6 @@ public class MainApp extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -77,7 +76,6 @@ public class MainApp extends Application {
     public static void main(String[] args) throws Exception {
         // load the native OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
         launch(args);
     }
 }

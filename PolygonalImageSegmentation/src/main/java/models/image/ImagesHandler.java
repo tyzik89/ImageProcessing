@@ -1,6 +1,6 @@
 package models.image;
 
-import constants.NotifyConstants;
+import models.notifications.constants.NotifyConstants;
 import fxelements.SingletonProcess;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -8,8 +8,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import models.algorithms.Algorithm;
 import models.algorithms.*;
-import models.notification.Observable;
-import models.notification.Observer;
+import models.notifications.Observable;
+import models.notifications.Observer;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -174,24 +174,14 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new WatershedSegmentation(markers));
     }
 
-    public void doWatershedSegmentationAutoMode(Mat detectedLines) {
+    public void doWatershedSegmentationAutoMode() {
+        Mat detectedLines = StorageMatrix.getInstance().getMatrixOfLines();
         Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
-        Mat mask = new Mat(matCurr.size(), CvType.CV_8UC1,  ImageUtils.COLOR_BLACK);
 
-        for (int i = 0, r = detectedLines.rows(); i < r; i++) {
-            for (int j = 0, c = detectedLines.cols(); j < c; j++) {
-                double[] line = detectedLines.get(i, j);
-                Imgproc.line(
-                        mask,
-                        new Point(line[0], line[1]), new Point(line[2], line[3]),
-                        ImageUtils.COLOR_WHITE,3);
-                break;
-            }
-            break;
-        }
 
-        storageImages.setTempImage(ImageUtils.matToImageFX(mask));
-        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
+
+//        storageImages.setTempImage(ImageUtils.matToImageFX());
+//        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
     }
 
     public void doMakeBlur(int sizeGaussFilter) {
