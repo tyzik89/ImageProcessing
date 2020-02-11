@@ -23,7 +23,10 @@ public class MarkersFormer {
     public Mat prepareMaskOfMarkers() {
         // Создание маркерного изображения для алгоритма водоразделов
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
+
+        lines = LineValidator.findCollinear(lines, lines.get(0));
 
         for (Line currentLine : lines) {
             //Проверяем линию на "надёжность" по длине

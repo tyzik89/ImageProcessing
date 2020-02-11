@@ -95,4 +95,47 @@ public class LineValidator {
     private static ArrayList<Point> generateSetPointsBetweenTwoPoints(double xstart, double ystart, double xend, double yend) {
         return generateSetPointsBetweenTwoPoints((int)xstart, (int)ystart, (int)xend, (int)yend);
     }
+
+    public static ArrayList<Line> findCollinear(ArrayList<Line> lines, Line line) {
+        ArrayList<Line> collinear = new ArrayList<Line>();
+
+        for (int i = 0; i < lines.size(); i++) {
+            Line temp = lines.get(i);
+            Point xy1 = line.getStartPoint();
+            Point xy2 = line.getEndPoint();
+            Point xy3 = temp.getStartPoint();
+            Point xy4 = temp.getEndPoint();
+
+            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
+            System.out.println(deteminant);
+
+            if (Double.compare(deteminant, 0.0) == 0) {
+                collinear.add(temp);
+            }
+        }
+
+        return collinear;
+    }
+
+    public static ArrayList<Line> findCollinearNearby(ArrayList<Line> lines, Line line, int distance) {
+        ArrayList<Line> collinearNearby = new ArrayList<Line>();
+
+        for (int i = 0; i < lines.size(); i++) {
+            Line temp = lines.get(i);
+
+            Point xy1 = line.getStartPoint();
+            Point xy2 = line.getEndPoint();
+            Point xy3 = temp.getStartPoint();
+            Point xy4 = temp.getEndPoint();
+
+            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
+            System.out.println(deteminant);
+
+            if (Double.compare(deteminant, 0.0) == 0) {
+                collinearNearby.add(temp);
+            }
+        }
+
+        return collinearNearby;
+    }
 }
