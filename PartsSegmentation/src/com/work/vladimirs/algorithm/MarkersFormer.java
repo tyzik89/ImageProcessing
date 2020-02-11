@@ -2,7 +2,6 @@ package com.work.vladimirs.algorithm;
 
 import com.work.vladimirs.algorithm.entities.Line;
 import com.work.vladimirs.utils.ImageUtils;
-import com.work.vladimirs.utils.ShowImage;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -10,8 +9,10 @@ import java.util.ArrayList;
 
 public class MarkersFormer {
 
-    private static final double distanceOfMarkers = 2.0;
-    private static final double ratioLength = 0.2;
+    private static final double DISTANCE_BETWEEN_MARKERS_AND_LINE = 2.0;
+    private static final double REDUCTION_RATIO_LENGTH = 0.2;
+    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 100.0;
+
     private Mat vectorOfLines;
     private Mat sourceMat;
 
@@ -26,7 +27,7 @@ public class MarkersFormer {
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
 
-        lines = LineValidator.findCollinear(lines, lines.get(0));
+        lines = LineValidator.findCollinearNearby(lines, lines.get(0), DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
 
         for (Line currentLine : lines) {
             //Проверяем линию на "надёжность" по длине
@@ -35,11 +36,11 @@ public class MarkersFormer {
             Line firstMarker = new Line();
             Line secondMarker = new Line();
             //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
-            findParallelMarkers(currentLine, firstMarker, secondMarker, distanceOfMarkers);
+            findParallelMarkers(currentLine, firstMarker, secondMarker, DISTANCE_BETWEEN_MARKERS_AND_LINE);
 
             //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
-            reduceMarkerLength(firstMarker, ratioLength);
-            reduceMarkerLength(secondMarker, ratioLength);
+            reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);
+            reduceMarkerLength(secondMarker, REDUCTION_RATIO_LENGTH);
 
             //Определяем тип маркера, сравнивая фон оригинального изображения
             //Фон ТЕМНЕЕ, это значит что это маркер фона.

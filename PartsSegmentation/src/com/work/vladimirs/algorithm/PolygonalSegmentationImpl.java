@@ -18,7 +18,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
     public PolygonalSegmentationImpl() {
         setPathname("src/resources/");
-        setFilename("test_image_6.bmp");
+        setFilename("test_image_9.bmp");
     }
 
 
@@ -34,7 +34,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
         ShowImage.show(ImageUtils.matToImageFX(bordersHighlight), "Canny");
 
         //Применяем метод Хафа и находим все прямые линии на картинке
-        algorithm = new HoughConversionAlgorithm(false, 0.1, 0.1, 25, 5, 0);
+        algorithm = new HoughConversionAlgorithm(false, 0.1, 0.1, 25, 30, 0);
         Mat vectorOfLines = algorithm.doAlgorithm(bordersHighlight);
 
         //Класс формирующий маску с маркерами.
