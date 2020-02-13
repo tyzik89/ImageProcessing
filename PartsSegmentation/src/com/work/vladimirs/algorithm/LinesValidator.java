@@ -4,13 +4,11 @@ import com.work.vladimirs.algorithm.entities.Line;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 public class LinesValidator {
 
-    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 100.0;
+    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 1.0;
     private static final int MINIMAL_LINE_LENGTH = 40;
     private Mat originalMat;
 
@@ -28,15 +26,23 @@ public class LinesValidator {
         typeLineTwo.removeAll(typeLineOne);
         System.out.println("Всего линий: " + lines.size() + "\nКоличество линий 1-го типа: " + typeLineOne.size() + "\nКоличество линий 2-го типа: " + typeLineTwo.size());
 
+        Map<Line, Line> typePairOfLineOne = findCollinearNearby(typeLineOne, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
+        //Map<Line, Line> typePairOfLineTwo = findCollinearNearby(typeLineTwo, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
+        System.out.println("Количество пар близких линий 1-го типа: " + typePairOfLineOne.size());
+        //System.out.println("Количество пар близких линий 2-го типа: " + typePairOfLineTwo.size());
 
+        for (Map.Entry<Line, Line> lineLineEntry : typePairOfLineOne.entrySet()) {
+            approvedLines.add(lineLineEntry.getKey());
+            approvedLines.add(lineLineEntry.getValue());
+        }
 
         return approvedLines;
     }
 
     private HashSet<Line> findCollinear(ArrayList<Line> lines, Line line) {
         HashSet<Line> collinear = new HashSet<>();
-
-        for (int i = 0; i < lines.size(); i++) {
+        collinear.add(line);
+        for (int i = 1; i < lines.size(); i++) {
             Line temp = lines.get(i);
             Point xy1 = line.getStartPoint();
             Point xy2 = line.getEndPoint();
@@ -44,7 +50,7 @@ public class LinesValidator {
             Point xy4 = temp.getEndPoint();
 
             double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
-            System.out.println(deteminant);
+//            System.out.println(deteminant);
 
             if (Double.compare(deteminant, 0.0) == 0) {
                 collinear.add(temp);
@@ -55,18 +61,34 @@ public class LinesValidator {
     }
 
     //Находим все близлежащие линии меньше заданной дистанции
-    //fixme доделать!!!!
-    private ArrayList<Line> findCollinearNearby(ArrayList<Line> lines, double distance) {
-        ArrayList<Line> collinearNearby = new ArrayList<>();
+    //fixme правильно расчитывать раастояние между именно лежащими парралельными линиями
+    private Map<Line, Line> findCollinearNearby(HashSet<Line> lines, double distance) {
+        Map<Line, Line> lineLineMap = new HashMap<>();
+        ArrayList<Line> rl = new ArrayList<Line>();
+        ArrayList<Line> lr = new ArrayList<Line>();
 
-        HashSet<Line> collinearLines = findCollinear(lines, lines.get(0));
-        for (Line collinearLine : collinearLines) {
-            double d = linePointDistance(lines.get(0), collinearLine.getStartPoint());
-            System.out.println(d);
-            if (d > 0 && d < distance) collinearNearby.add(collinearLine);
+        /*for (int i = 0; i < list.size(); i++) {
+            for (int j = i+1; j < list.size(); j++) {
+                // compare list.get(i) and list.get(j)
+            }
+        }*/
+
+        rl.addAll(lines);
+        lr.addAll(rl);
+        Collections.reverse(lr);
+        for (Line lineA : rl) {
+            lr.remove(lr.size()-1);
+            for (Line lineZ : lr) {
+                double d = linePointDistance(lineA, lineZ.getStartPoint());
+                System.out.println(d);
+                if (Double.compare(d, distance) == -1) {
+                    double dp = lengthBetweenPoint(lineA.getStartPoint(),lineZ.getStartPoint());
+                    if (Double.compare(dp, 200) == -1)
+                        lineLineMap.put(lineA, lineZ);
+                }
+            }
         }
-
-        return collinearNearby;
+        return lineLineMap;
     }
 
     private double linePointDistance(Line line, Point point) {
