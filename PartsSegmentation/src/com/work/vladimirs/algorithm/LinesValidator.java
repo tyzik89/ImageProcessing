@@ -1,27 +1,108 @@
 package com.work.vladimirs.algorithm;
 
 import com.work.vladimirs.algorithm.entities.Line;
+import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
-public class LineValidator {
+public class LinesValidator {
 
-    public static boolean validateLineLength(Line currentLine) {
+    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 100.0;
+    private static final int MINIMAL_LINE_LENGTH = 40;
+    private Mat originalMat;
+
+    public LinesValidator(Mat originalMat) {
+        this.originalMat = originalMat;
+    }
+
+    public ArrayList<Line> validate(ArrayList<Line> lines) {
+        ArrayList<Line> approvedLines = new ArrayList<Line>();
+
+        //Получаем два множества горизонтальных и вертикальных линий
+        HashSet<Line> typeLineOne = findCollinear(lines, lines.get(0));
+        HashSet<Line> typeLineTwo = new HashSet<>();
+        typeLineTwo.addAll(lines);
+        typeLineTwo.removeAll(typeLineOne);
+        System.out.println("Всего линий: " + lines.size() + "\nКоличество линий 1-го типа: " + typeLineOne.size() + "\nКоличество линий 2-го типа: " + typeLineTwo.size());
+
+
+
+        return approvedLines;
+    }
+
+    private HashSet<Line> findCollinear(ArrayList<Line> lines, Line line) {
+        HashSet<Line> collinear = new HashSet<>();
+
+        for (int i = 0; i < lines.size(); i++) {
+            Line temp = lines.get(i);
+            Point xy1 = line.getStartPoint();
+            Point xy2 = line.getEndPoint();
+            Point xy3 = temp.getStartPoint();
+            Point xy4 = temp.getEndPoint();
+
+            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
+            System.out.println(deteminant);
+
+            if (Double.compare(deteminant, 0.0) == 0) {
+                collinear.add(temp);
+            }
+        }
+
+        return collinear;
+    }
+
+    //Находим все близлежащие линии меньше заданной дистанции
+    //fixme доделать!!!!
+    private ArrayList<Line> findCollinearNearby(ArrayList<Line> lines, double distance) {
+        ArrayList<Line> collinearNearby = new ArrayList<>();
+
+        HashSet<Line> collinearLines = findCollinear(lines, lines.get(0));
+        for (Line collinearLine : collinearLines) {
+            double d = linePointDistance(lines.get(0), collinearLine.getStartPoint());
+            System.out.println(d);
+            if (d > 0 && d < distance) collinearNearby.add(collinearLine);
+        }
+
+        return collinearNearby;
+    }
+
+    private double linePointDistance(Line line, Point point) {
+        double vector_x = line.getEndPoint().x - line.getStartPoint().x;
+        double vector_y = line.getEndPoint().y - line.getStartPoint().y;
+        double lineLen = lengthBetweenPoint(vector_x, vector_y);
+        if (Double.compare(lineLen, 0.0) == 0) // Replace with appropriate epsilon
+        {
+            return lengthBetweenPoint(point.x - line.getStartPoint().x, point.y - line.getStartPoint().y);
+        }
+
+        double norm_perpendicular_x = -(vector_y / lineLen);
+        double norm_perpendicular_y = vector_x/lineLen;
+
+        double dot = ((point.x - line.getStartPoint().x) * norm_perpendicular_x + (point.y - line.getStartPoint().y) * norm_perpendicular_y); // Compute dot product (P3 - P1) dot( norm ( P2 - P1 ))
+        return Math.abs(dot);
+    }
+
+    private double lengthBetweenPoint(double x, double y) {
+        return Math.sqrt(x*x + y*y);
+    }
+
+    private double lengthBetweenPoint(Point p1, Point p2) {
+        return Math.sqrt((p2.x - p1.x)*(p2.x - p1.x) + (p2.y - p1.y)*(p2.y - p1.y));
+    }
+
+    private boolean isLineLengthRight(Line currentLine) {
         Point p1 = currentLine.getStartPoint();
         Point p2 = currentLine.getEndPoint();
-        ArrayList<Point> pointArrayList = generateSetPointsBetweenTwoPoints(p1.x, p1.y, p2.x, p2.y);
-//        if (pointArrayList.size() < 40) {
-//            System.out.println("FALSE!!!"); return false;}
-
-        return true;
+        return (lengthBetweenPoint(p1, p2) >= MINIMAL_LINE_LENGTH);
     }
 
     /**
      * реализация алгоритма Брезенхема
      */
-    private static ArrayList<Point> generateSetPointsBetweenTwoPoints(int xstart, int ystart, int xend, int yend) {
+    private  ArrayList<Point> generateSetPointsBetweenTwoPoints(int xstart, int ystart, int xend, int yend) {
         ArrayList<Point> pointArray = new ArrayList<>();
         int x, y, dx, dy, incx, incy, pdx, pdy, es, el, err;
 
@@ -88,67 +169,12 @@ public class LineValidator {
         return pointArray;
     }
 
-    private static int sign (int x) {
+    private  int sign (int x) {
         return (x > 0) ? 1 : (x < 0) ? -1 : 0;
         //возвращает 0, если аргумент (x) равен нулю; -1, если x < 0 и 1, если x > 0.
     }
 
-    private static ArrayList<Point> generateSetPointsBetweenTwoPoints(double xstart, double ystart, double xend, double yend) {
+    private  ArrayList<Point> generateSetPointsBetweenTwoPoints(double xstart, double ystart, double xend, double yend) {
         return generateSetPointsBetweenTwoPoints((int)xstart, (int)ystart, (int)xend, (int)yend);
-    }
-
-    public static ArrayList<Line> findCollinear(ArrayList<Line> lines, Line line) {
-        ArrayList<Line> collinear = new ArrayList<>();
-
-        for (int i = 0; i < lines.size(); i++) {
-            Line temp = lines.get(i);
-            Point xy1 = line.getStartPoint();
-            Point xy2 = line.getEndPoint();
-            Point xy3 = temp.getStartPoint();
-            Point xy4 = temp.getEndPoint();
-
-            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
-            System.out.println(deteminant);
-
-            if (Double.compare(deteminant, 0.0) == 0) {
-                collinear.add(temp);
-            }
-        }
-
-        return collinear;
-    }
-
-    public static ArrayList<Line> findCollinearNearby(ArrayList<Line> lines, Line line, double distance) {
-        ArrayList<Line> collinearNearby = new ArrayList<>();
-        collinearNearby.add(line);
-
-        ArrayList<Line> collinearLines = findCollinear(lines, line);
-        for (Line collinearLine : collinearLines) {
-            double d = linePointDistance(line, collinearLine.getStartPoint());
-            System.out.println(d);
-            if (d > 0 && d < distance) collinearNearby.add(collinearLine);
-        }
-
-        return collinearNearby;
-    }
-
-    private static double linePointDistance(Line line, Point point) {
-        double vector_x = line.getEndPoint().x - line.getStartPoint().x;
-        double vector_y = line.getEndPoint().y - line.getStartPoint().y;
-        double lineLen = lengthBetweenPoint(vector_x, vector_y);
-        if (Double.compare(lineLen, 0.0) == 0) // Replace with appropriate epsilon
-        {
-            return lengthBetweenPoint(point.x - line.getStartPoint().x, point.y - line.getStartPoint().y);
-        }
-
-        double norm_perpendicular_x = -(vector_y / lineLen);
-        double norm_perpendicular_y = vector_x/lineLen;
-
-        double dot = ((point.x - line.getStartPoint().x) * norm_perpendicular_x + (point.y - line.getStartPoint().y) * norm_perpendicular_y); // Compute dot product (P3 - P1) dot( norm ( P2 - P1 ))
-        return Math.abs(dot);
-    }
-
-    private static double lengthBetweenPoint(double x, double y) {
-        return Math.sqrt(x*x + y*y);
     }
 }

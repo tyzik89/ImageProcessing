@@ -11,7 +11,6 @@ public class MarkersFormer {
 
     private static final double DISTANCE_BETWEEN_MARKERS_AND_LINE = 2.0;
     private static final double REDUCTION_RATIO_LENGTH = 0.2;
-    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 100.0;
 
     private Mat vectorOfLines;
     private Mat sourceMat;
@@ -27,11 +26,11 @@ public class MarkersFormer {
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
 
-        lines = LineValidator.findCollinearNearby(lines, lines.get(0), DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
+        //Делаем проверки всех полученных векторов, отбрасывая не надёжные
+        LinesValidator validator = new LinesValidator(sourceMat);
+        lines = validator.validate(lines);
 
         for (Line currentLine : lines) {
-            //Проверяем линию на "надёжность" по длине
-            if (!LineValidator.validateLineLength(currentLine)) continue;
 
             Line firstMarker = new Line();
             Line secondMarker = new Line();
