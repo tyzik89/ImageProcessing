@@ -8,7 +8,7 @@ import java.util.*;
 
 public class LinesValidator {
 
-    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 1.0;
+    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 5.0;
     private static final int MINIMAL_LINE_LENGTH = 40;
     private Mat originalMat;
 
@@ -27,41 +27,25 @@ public class LinesValidator {
         System.out.println("Всего линий: " + lines.size() + "\nКоличество линий 1-го типа: " + typeLineOne.size() + "\nКоличество линий 2-го типа: " + typeLineTwo.size());
 
         Map<Line, Line> typePairOfLineOne = findCollinearNearby(typeLineOne, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
-        //Map<Line, Line> typePairOfLineTwo = findCollinearNearby(typeLineTwo, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
+        Map<Line, Line> typePairOfLineTwo = findCollinearNearby(typeLineTwo, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
         System.out.println("Количество пар близких линий 1-го типа: " + typePairOfLineOne.size());
-        //System.out.println("Количество пар близких линий 2-го типа: " + typePairOfLineTwo.size());
+        System.out.println("Количество пар близких линий 2-го типа: " + typePairOfLineTwo.size());
 
         for (Map.Entry<Line, Line> lineLineEntry : typePairOfLineOne.entrySet()) {
             approvedLines.add(lineLineEntry.getKey());
             approvedLines.add(lineLineEntry.getValue());
         }
+        for (Map.Entry<Line, Line> lineLineEntry : typePairOfLineTwo.entrySet()) {
+            approvedLines.add(lineLineEntry.getKey());
+            approvedLines.add(lineLineEntry.getValue());
+        }
+
 
         return approvedLines;
     }
 
-    private HashSet<Line> findCollinear(ArrayList<Line> lines, Line line) {
-        HashSet<Line> collinear = new HashSet<>();
-        collinear.add(line);
-        for (int i = 1; i < lines.size(); i++) {
-            Line temp = lines.get(i);
-            Point xy1 = line.getStartPoint();
-            Point xy2 = line.getEndPoint();
-            Point xy3 = temp.getStartPoint();
-            Point xy4 = temp.getEndPoint();
-
-            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
-//            System.out.println(deteminant);
-
-            if (Double.compare(deteminant, 0.0) == 0) {
-                collinear.add(temp);
-            }
-        }
-
-        return collinear;
-    }
-
     //Находим все близлежащие линии меньше заданной дистанции
-    //fixme правильно расчитывать раастояние между именно лежащими парралельными линиями
+    //fixme правильно расчитывать раастояние между именно лежащими рядом парралельными линиями
     private Map<Line, Line> findCollinearNearby(HashSet<Line> lines, double distance) {
         Map<Line, Line> lineLineMap = new HashMap<>();
         ArrayList<Line> rl = new ArrayList<Line>();
@@ -80,15 +64,43 @@ public class LinesValidator {
             lr.remove(lr.size()-1);
             for (Line lineZ : lr) {
                 double d = linePointDistance(lineA, lineZ.getStartPoint());
-                System.out.println(d);
-                if (Double.compare(d, distance) == -1) {
-                    double dp = lengthBetweenPoint(lineA.getStartPoint(),lineZ.getStartPoint());
-                    if (Double.compare(dp, 200) == -1)
+//                System.out.println("d = " + d);
+                //if (Double.compare(d, 0.0) == 1 && Double.compare(d, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES) == -1)
+                if (Double.compare(d, 0.0) == 1 && Double.compare(d, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES) == -1) {
+                    Point centerLineA = findLineCenter(lineA);
+                    Point centerLineZ = findLineCenter(lineZ);
+                    double lengthLineA = lengthBetweenPoint(lineA.getStartPoint(),lineA.getEndPoint());
+                    double lengthLineZ = lengthBetweenPoint(lineZ.getStartPoint(),lineZ.getEndPoint());
+                    double lengthBetweenCenter = lengthBetweenPoint(centerLineA, centerLineZ);
+                    if (Double.compare(lengthBetweenCenter, (lengthLineA + lengthLineZ)/2) == -1) {
                         lineLineMap.put(lineA, lineZ);
+                    }
                 }
+
             }
         }
         return lineLineMap;
+    }
+
+    private HashSet<Line> findCollinear(ArrayList<Line> lines, Line line) {
+        HashSet<Line> collinear = new HashSet<>();
+        collinear.add(line);
+        for (int i = 1; i < lines.size(); i++) {
+            Line temp = lines.get(i);
+            Point xy1 = line.getStartPoint();
+            Point xy2 = line.getEndPoint();
+            Point xy3 = temp.getStartPoint();
+            Point xy4 = temp.getEndPoint();
+
+            double deteminant = ((xy2.x - xy1.x) / (xy2.y - xy1.y)) - ((xy4.x - xy3.x) / (xy4.y - xy3.y));
+//            System.out.println(deteminant);
+
+            if (Double.compare(deteminant, 0.0) == 0 || Double.isNaN(deteminant)) {
+                collinear.add(temp);
+            }
+        }
+
+        return collinear;
     }
 
     private double linePointDistance(Line line, Point point) {
@@ -119,6 +131,12 @@ public class LinesValidator {
         Point p1 = currentLine.getStartPoint();
         Point p2 = currentLine.getEndPoint();
         return (lengthBetweenPoint(p1, p2) >= MINIMAL_LINE_LENGTH);
+    }
+
+    private Point findLineCenter(Line line) {
+        Point p1 = line.getStartPoint();
+        Point p2 = line.getEndPoint();
+        return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
     }
 
     /**
