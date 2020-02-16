@@ -8,7 +8,7 @@ import java.util.*;
 
 public class LinesValidator {
 
-    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 5.0;
+    private static final double DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 25.0;
     private static final int MINIMAL_LINE_LENGTH = 40;
     private Mat originalMat;
 
@@ -39,7 +39,6 @@ public class LinesValidator {
             approvedLines.add(lineLineEntry.getKey());
             approvedLines.add(lineLineEntry.getValue());
         }
-
 
         return approvedLines;
     }
