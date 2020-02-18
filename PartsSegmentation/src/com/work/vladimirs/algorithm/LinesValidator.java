@@ -19,45 +19,31 @@ public class LinesValidator {
     public ArrayList<Line> validate(ArrayList<Line> lines) {
         ArrayList<Line> approvedLines = new ArrayList<Line>();
 
-        //Получаем два множества горизонтальных и вертикальных линий
-        HashSet<Line> typeLineOne = findCollinear(lines, lines.get(0));
-        HashSet<Line> typeLineTwo = new HashSet<>();
-        typeLineTwo.addAll(lines);
-        typeLineTwo.removeAll(typeLineOne);
-        System.out.println("Всего линий: " + lines.size() + "\nКоличество линий 1-го типа: " + typeLineOne.size() + "\nКоличество линий 2-го типа: " + typeLineTwo.size());
 
-        Map<Line, Line> typePairOfLineOne = findCollinearNearby(typeLineOne, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
-        Map<Line, Line> typePairOfLineTwo = findCollinearNearby(typeLineTwo, DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES);
-        System.out.println("Количество пар близких линий 1-го типа: " + typePairOfLineOne.size());
-        System.out.println("Количество пар близких линий 2-го типа: " + typePairOfLineTwo.size());
-
-        for (Map.Entry<Line, Line> lineLineEntry : typePairOfLineOne.entrySet()) {
-            approvedLines.add(lineLineEntry.getKey());
-            approvedLines.add(lineLineEntry.getValue());
-        }
-        for (Map.Entry<Line, Line> lineLineEntry : typePairOfLineTwo.entrySet()) {
-            approvedLines.add(lineLineEntry.getKey());
-            approvedLines.add(lineLineEntry.getValue());
-        }
 
         return approvedLines;
     }
 
+
+
+
+
+
+
+    //==================================================================================================================
     //Находим все близлежащие линии меньше заданной дистанции
     //fixme правильно расчитывать раастояние между именно лежащими рядом парралельными линиями
-    private Map<Line, Line> findCollinearNearby(HashSet<Line> lines, double distance) {
+ /*   private Map<Line, Line> findCollinearNearby(HashSet<Line> lines, double distance) {
         Map<Line, Line> lineLineMap = new HashMap<>();
-        ArrayList<Line> rl = new ArrayList<Line>();
-        ArrayList<Line> lr = new ArrayList<Line>();
 
-        /*for (int i = 0; i < list.size(); i++) {
+        *//*for (int i = 0; i < list.size(); i++) {
             for (int j = i+1; j < list.size(); j++) {
                 // compare list.get(i) and list.get(j)
             }
-        }*/
+        }*//*
 
-        rl.addAll(lines);
-        lr.addAll(rl);
+        ArrayList<Line> rl = new ArrayList<Line>(lines);
+        ArrayList<Line> lr = new ArrayList<Line>(rl);
         Collections.reverse(lr);
         for (Line lineA : rl) {
             lr.remove(lr.size()-1);
@@ -118,29 +104,15 @@ public class LinesValidator {
         return Math.abs(dot);
     }
 
-    private double lengthBetweenPoint(double x, double y) {
-        return Math.sqrt(x*x + y*y);
-    }
-
-    private double lengthBetweenPoint(Point p1, Point p2) {
-        return Math.sqrt((p2.x - p1.x)*(p2.x - p1.x) + (p2.y - p1.y)*(p2.y - p1.y));
-    }
-
     private boolean isLineLengthRight(Line currentLine) {
         Point p1 = currentLine.getStartPoint();
         Point p2 = currentLine.getEndPoint();
         return (lengthBetweenPoint(p1, p2) >= MINIMAL_LINE_LENGTH);
     }
 
-    private Point findLineCenter(Line line) {
-        Point p1 = line.getStartPoint();
-        Point p2 = line.getEndPoint();
-        return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-    }
-
-    /**
+    *//**
      * реализация алгоритма Брезенхема
-     */
+     *//*
     private  ArrayList<Point> generateSetPointsBetweenTwoPoints(int xstart, int ystart, int xend, int yend) {
         ArrayList<Point> pointArray = new ArrayList<>();
         int x, y, dx, dy, incx, incy, pdx, pdy, es, el, err;
@@ -149,16 +121,16 @@ public class LinesValidator {
         dy = yend - ystart;//проекция на ось Y
 
         incx = sign(dx);
-        /*
+        *//*
          * Определяем, в какую сторону нужно будет сдвигаться. Если dx < 0, т.е. отрезок идёт
          * справа налево по иксу, то incx будет равен -1.
          * Это будет использоваться в цикле постороения.
-         */
+         *//*
         incy = sign(dy);
-        /*
+        *//*
          * Аналогично. Если рисуем отрезок снизу вверх -
          * это будет отрицательный сдвиг для y (иначе - положительный).
-         */
+         *//*
 
         if (dx < 0) dx = -dx;//далее мы будем сравнивать: "if (dx < dy)"
         if (dy < 0) dy = -dy;//поэтому необходимо сделать dx = |dx|; dy = |dy|
@@ -167,12 +139,12 @@ public class LinesValidator {
         if (dx > dy)
         //определяем наклон отрезка:
         {
-            /*
+            *//*
              * Если dx > dy, то значит отрезок "вытянут" вдоль оси икс, т.е. он скорее длинный, чем высокий.
              * Значит в цикле нужно будет идти по икс (строчка el = dx;), значит "протягивать" прямую по иксу
              * надо в соответствии с тем, слева направо и справа налево она идёт (pdx = incx;), при этом
              * по y сдвиг такой отсутствует.
-             */
+             *//*
             pdx = incx;	pdy = 0;
             es = dy;	el = dx;
         }
@@ -215,5 +187,5 @@ public class LinesValidator {
 
     private  ArrayList<Point> generateSetPointsBetweenTwoPoints(double xstart, double ystart, double xend, double yend) {
         return generateSetPointsBetweenTwoPoints((int)xstart, (int)ystart, (int)xend, (int)yend);
-    }
+    }*/
 }
