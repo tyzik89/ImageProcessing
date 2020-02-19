@@ -43,12 +43,12 @@ public class MarkersFormer {
 
             //Определяем тип маркера, сравнивая фон оригинального изображения
             //Фон ТЕМНЕЕ, это значит что это маркер фона.
-            MarkersGradientComparator gradientComparator = new MarkersGradientComparator(sourceMat);
-            int comp = gradientComparator.compare(firstMarker, secondMarker);
-            if (comp < 0) {
+            GradientComparator gradientComparator = new GradientComparator(sourceMat);
+            int compared = gradientComparator.compare(firstMarker, secondMarker);
+            if (compared < 0) {
                 createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
                 createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
-            } else if (comp > 0) {
+            } else if (compared > 0) {
                 createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
                 createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_GRAY);
             }

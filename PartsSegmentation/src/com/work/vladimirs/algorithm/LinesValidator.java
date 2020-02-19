@@ -8,8 +8,8 @@ import java.util.*;
 
 public class LinesValidator {
 
+    //Максимальная дистанция между отрезками, которые считаются близко расположенными
     private static final double MAXIMAL_DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 25.0;
-    private static final int MINIMAL_LINE_LENGTH = 40;
     private Mat originalMat;
 
     public LinesValidator(Mat originalMat) {
@@ -17,13 +17,20 @@ public class LinesValidator {
     }
 
     public ArrayList<Line> validate(ArrayList<Line> lines) {
-        ArrayList<Line> approvedLines = new ArrayList<Line>();
+        ArrayList<Line> approvedLines = new ArrayList<>();
 
+        HashSet<Line> setAllLines = new HashSet<>(lines);
+        HashSet<Line> setApprovedNearbyLines = new HashSet<>();
         ArrayList<ArrayList<Line>> pairOfCollinearNearbyLines = getPairOfCollinearNearbyLines(lines);
         for (ArrayList<Line> pairOfCollinearNearbyLine : pairOfCollinearNearbyLines) {
-            approvedLines.addAll(pairOfCollinearNearbyLine);
+            setAllLines.removeAll(pairOfCollinearNearbyLine);
+            GradientComparator gradientComparator = new GradientComparator(originalMat);
+            int compared = gradientComparator.compare(pairOfCollinearNearbyLine.get(0), pairOfCollinearNearbyLine.get(1));
+            setApprovedNearbyLines.add(compared < 0 ? pairOfCollinearNearbyLine.get(1) : pairOfCollinearNearbyLine.get(0));
         }
 
+        setAllLines.addAll(setApprovedNearbyLines);
+        approvedLines.addAll(setAllLines);
         return approvedLines;
     }
 
@@ -37,27 +44,24 @@ public class LinesValidator {
         for (Line lineA : rl) {
             lr.remove(lr.size() - 1);
             for (Line lineZ : lr) {
-
                 //Если два отрезка коллинеарны
                 if (AnalyticGeometry.checkCollinearityOfTwoLinesByPseudoScalarProduct(lineA, lineZ)) {
-                    //Если два отрезка расположенные достаточно близко друг к другу
-                    //Получаем расстояние от точки отрезка до прямой, на которой лежит другой отрезок
+                    //Проверяем, что два отрезка расположенны достаточно близко друг к другу
+                    //Получаем расстояние от конца отрезка до прямой, на которой лежит другой отрезок
                     double distance = AnalyticGeometry.getDistanceFromPointToStraightLine(lineA.getStartPoint(), lineZ);
-                    System.out.println("distance = " + distance);
+                    //System.out.println(distance);
                     //Если дистанция не превышает заданную
                     if (Double.compare(distance, MAXIMAL_DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES) <= 0) {
                         //И если линии действительно лежат близко друг от друга, т.е. проекция одной пересекает другую
-                        //т.е. начальная или конечная точки первого лежат над вторым отрезком
-                        if (AnalyticGeometry.isPointOverSegment(lineA.getStartPoint(), lineZ) || AnalyticGeometry.isPointOverSegment(lineA.getEndPoint(), lineZ)) {
+                        //т.е. начальная или конечная точки первого лежат над вторым отрезком или наоборот, т.к. пробегаем по линиям единожды
+                        if ((AnalyticGeometry.isPointOverSegment(lineA.getStartPoint(), lineZ) || AnalyticGeometry.isPointOverSegment(lineA.getEndPoint(), lineZ))
+                         || (AnalyticGeometry.isPointOverSegment(lineZ.getStartPoint(), lineA) || AnalyticGeometry.isPointOverSegment(lineZ.getEndPoint(), lineA))){
                             arrayPairOfCollinearNearbyLines.add(new ArrayList<Line>() {{add(lineA); add(lineZ);}} );
                         }
                     }
                 }
-
             }
         }
-        System.out.println("lines.size()= " + lines.size());
-        System.out.println("arrayPairOfCollinearNearbyLines.size()= " + arrayPairOfCollinearNearbyLines.size());
         return arrayPairOfCollinearNearbyLines;
     }
 }

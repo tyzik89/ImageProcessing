@@ -90,7 +90,7 @@ public final class AnalyticGeometry {
      */
     public static boolean checkCollinearityOfTwoLinesByPseudoScalarProduct(Line l1, Line l2) {
         Point vec_l1 = getVectorByTwoPoints(l1.getStartPoint(), l1.getEndPoint());
-        Point vec_l2 = getVectorByTwoPoints(l2.getStartPoint(), l2.getEndPoint());
+        Point vec_l2 =   getVectorByTwoPoints(l2.getStartPoint(), l2.getEndPoint());
         double value = getPseudoScalarProductOfVectors(vec_l1, vec_l2);
         return Double.compare(value, 0.0) == 0;
     }
