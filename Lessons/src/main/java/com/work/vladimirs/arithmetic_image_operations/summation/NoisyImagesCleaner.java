@@ -1,22 +1,26 @@
 package com.work.vladimirs.arithmetic_image_operations.summation;
 
-import com.work.vladimirs.utils.ShowImage;
 import javafx.application.Application;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Random;
 
 /**
  * Сложение (усреднение) серии зашумленных изображений, для снижения уровня шума
  */
 public class NoisyImagesCleaner {
 
+    private static final String DIR_NAME = "src/main/resources/NoisyImagesCleaner/";
+    private static final int COUNT_NOISE_IMAGES = 10;
+
     public void process() {
 
     }
+
 
     /**
      * Создание серии изображений, искажённых аддитивным гауссовым шумом
@@ -24,28 +28,37 @@ public class NoisyImagesCleaner {
      */
     public static class GaussNoiseAdder {
 
-        public void createSetImages() {
-            createSetImages(NoisyImagesCleaner.class.getSimpleName());
+        public void createSetImages(int count) {
+            createSetImages(NoisyImagesCleaner.class.getSimpleName(), count);
         }
 
-        public void createSetImages(String pathToImage) {
-            File dir = new File(getClass().getClassLoader().getResource(pathToImage).getFile());
+        public void createSetImages(String pathToImage, int count) {
+            File dir = new File(DIR_NAME);
             File[] files = dir.listFiles();
+            if (files == null || files.length == 0) return;
             for (File file : files) {
                 if (!file.isFile()) continue;
-                Image image = new Image(file.toURI().toString());
-                image = addNoise(image);
+                Mat image = Imgcodecs.imread(DIR_NAME + "\\" + file.getName());
+                File noiseSetDir = new File(DIR_NAME + "\\" + file.getName().replaceAll("[.]\\D*", ""));
+                noiseSetDir.mkdir();
+                for (int i = 1; i <= count; i++) {
+                    Mat gaussianNoise = addNoise(image);
+                    Imgcodecs.imwrite(noiseSetDir.getPath() + "\\" + i + "_" + file.getName(), gaussianNoise);
+                }
             }
         }
 
-        private Image addNoise(Image image) {
-
-            return new Image("");
+        private Mat addNoise(Mat image) {
+            Mat noise = Mat.zeros(image.rows(), image.cols(), image.type());
+            Core.randn(noise, new Random().nextInt(11), new Random().nextInt(81) + 81);   //mean - среднее значение, stddev - стандартное отклонение
+            Mat gaussianNoise = image.clone();
+            Core.add(image, noise, gaussianNoise);
+            return gaussianNoise;
         }
     }
 
     /**
-     * Запуск тестирования
+     * Запуск
      */
     public static class Run extends Application {
 
@@ -58,7 +71,13 @@ public class NoisyImagesCleaner {
         @Override
         public void start(Stage primaryStage) throws Exception {
             GaussNoiseAdder noiseAdder = new GaussNoiseAdder();
-            noiseAdder.createSetImages();
+            noiseAdder.createSetImages(COUNT_NOISE_IMAGES);
+            System.out.println("Generation noises images are done!");
+
+            NoisyImagesCleaner noisyCleaner = new NoisyImagesCleaner();
+            noisyCleaner.process();
+            System.out.println("Delete noise is done!");
+            System.exit(0);
         }
     }
 }
