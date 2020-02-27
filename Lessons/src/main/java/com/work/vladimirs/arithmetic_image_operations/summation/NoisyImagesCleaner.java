@@ -51,7 +51,7 @@ public class NoisyImagesCleaner {
         private Mat addNoise(Mat image) {
             Mat noise = Mat.zeros(image.rows(), image.cols(), image.type());
             Core.randn(noise, new Random().nextInt(11), new Random().nextInt(81) + 81);   //mean - среднее значение, stddev - стандартное отклонение
-            Mat gaussianNoise = image.clone();
+            Mat gaussianNoise = new Mat();
             Core.add(image, noise, gaussianNoise);
             return gaussianNoise;
         }
