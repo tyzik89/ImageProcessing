@@ -3,14 +3,11 @@ package com.work.vladimirs.arithmetic_image_operations.summation;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -19,7 +16,7 @@ import java.util.Random;
 public class NoisyImagesCleaner {
 
     private static final String DIR_NAME = "src/main/resources/NoisyImagesCleaner/";
-    private static final int COUNT_NOISE_IMAGES = 10;
+    private static final int COUNT_NOISE_IMAGES = 50;
 
     void process(String pathToImage) {
         File dir = new File(pathToImage);
@@ -37,15 +34,39 @@ public class NoisyImagesCleaner {
                 noisyImages.add(noisyImage);
             }
             if (noisyImages.size() == 0) continue;
-            //Делаем устреднение набора изображений
-            Mat avgImg = imagesAveraging(noisyImages);
+            Mat avgImg = imagesAveraging(noisyImages);          //Делаем устреднение набора изображений
             Imgcodecs.imwrite(pathToImage + "result_" + file.getName(), avgImg);
         }
     }
 
     private Mat imagesAveraging(ArrayList<Mat> noisyImages) {
-        Mat resultImg = new Mat();
+        int count = noisyImages.size();
+        int cols = noisyImages.get(0).cols();
+        int rows = noisyImages.get(0).rows();
+        int channels = noisyImages.get(0).channels();
+        int type = noisyImages.get(0).type();
 
+        int[] tempIntArr = new int[cols * rows * channels];
+
+        for (Mat noisyImage : noisyImages) {
+            byte[] noisyImageArr = new byte[cols * rows * channels];
+            noisyImage.get(0, 0, noisyImageArr);
+            int color;
+            for (int i = 0, j = noisyImageArr.length; i < j; i++) {
+                color = noisyImageArr[i] & 0xFF;        //Получение беззнакового int (расширение до 32 бит без знака)
+                tempIntArr[i] = tempIntArr[i] + color;
+            }
+        }
+
+        byte[] resultImgArr = new byte[cols * rows * channels];
+        for (int i = 0, j = tempIntArr.length; i < j; i++) {
+            int val = tempIntArr[i] / count;
+            val = val > 255 ? 255 : (val < 0 ? 0 : val);        //Проверка выхода за границы
+            resultImgArr[i] = (byte) (val);
+        }
+
+        Mat resultImg = new Mat(rows, cols, type);
+        resultImg.put(0, 0, resultImgArr);
         return resultImg;
     }
 
