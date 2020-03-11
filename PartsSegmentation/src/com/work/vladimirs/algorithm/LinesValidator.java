@@ -16,29 +16,33 @@ public class LinesValidator {
         this.originalMat = originalMat;
     }
 
-    public ArrayList<Line> validate(ArrayList<Line> lines) {
+    public ArrayList<Line> validate(ArrayList<Line> rawLines) {
         ArrayList<Line> approvedLines = new ArrayList<>();
 
-        HashSet<Line> setAllLines = new HashSet<>(lines);
+        HashSet<Line> setAllLines = new HashSet<>(rawLines);
         HashSet<Line> setApprovedNearbyLines = new HashSet<>();
-        ArrayList<ArrayList<Line>> pairOfCollinearNearbyLines = getPairOfCollinearNearbyLines(lines);
+        ArrayList<ArrayList<Line>> pairOfCollinearNearbyLines = getPairOfCollinearNearbyLines(rawLines);
+
+        //Для каждой пары линий делаем сравнение их яркостей, отбрасываем линии, принадлежащие фону
         for (ArrayList<Line> pairOfCollinearNearbyLine : pairOfCollinearNearbyLines) {
+            //Удаляем подозрительную пару близкорасположенных линий
             setAllLines.removeAll(pairOfCollinearNearbyLine);
             GradientComparator gradientComparator = new GradientComparator(originalMat);
             int compared = gradientComparator.compare(pairOfCollinearNearbyLine.get(0), pairOfCollinearNearbyLine.get(1));
             setApprovedNearbyLines.add(compared < 0 ? pairOfCollinearNearbyLine.get(1) : pairOfCollinearNearbyLine.get(0));
         }
 
+        //Добавляем ранее удалённые, но теперь уже подтверждённые линии
         setAllLines.addAll(setApprovedNearbyLines);
         approvedLines.addAll(setAllLines);
         return approvedLines;
     }
 
-    private ArrayList<ArrayList<Line>> getPairOfCollinearNearbyLines(ArrayList<Line> lines) {
+    private ArrayList<ArrayList<Line>> getPairOfCollinearNearbyLines(ArrayList<Line> rawLines) {
         //Создаём двумерное хранилище пар близко расположенных параллельных линий
         ArrayList<ArrayList<Line>> arrayPairOfCollinearNearbyLines = new ArrayList<>();
         //Нам необходимо сравнить каждый отрезок с каждым
-        ArrayList<Line> rl = new ArrayList<Line>(lines);
+        ArrayList<Line> rl = new ArrayList<Line>(rawLines);
         ArrayList<Line> lr = new ArrayList<Line>(rl);
         Collections.reverse(lr);
         for (Line lineA : rl) {
@@ -55,13 +59,15 @@ public class LinesValidator {
                         //И если линии действительно лежат близко друг от друга, т.е. проекция одной пересекает другую
                         //т.е. начальная или конечная точки первого лежат над вторым отрезком или наоборот, т.к. пробегаем по линиям единожды
                         if ((AnalyticGeometry.isPointOverSegment(lineA.getStartPoint(), lineZ) || AnalyticGeometry.isPointOverSegment(lineA.getEndPoint(), lineZ))
-                         || (AnalyticGeometry.isPointOverSegment(lineZ.getStartPoint(), lineA) || AnalyticGeometry.isPointOverSegment(lineZ.getEndPoint(), lineA))){
+                                || (AnalyticGeometry.isPointOverSegment(lineZ.getStartPoint(), lineA) || AnalyticGeometry.isPointOverSegment(lineZ.getEndPoint(), lineA))) {
+
                             arrayPairOfCollinearNearbyLines.add(new ArrayList<Line>() {{add(lineA); add(lineZ);}} );
                         }
                     }
                 }
             }
         }
+
         return arrayPairOfCollinearNearbyLines;
     }
 }

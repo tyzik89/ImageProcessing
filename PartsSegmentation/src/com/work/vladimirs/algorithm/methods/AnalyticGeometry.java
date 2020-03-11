@@ -60,8 +60,7 @@ public final class AnalyticGeometry {
         Point vec_p2m = getVectorByTwoPoints(lineSegment.getEndPoint(), m);
         Point vec_p2p1 = getVectorByTwoPoints(lineSegment.getEndPoint(), lineSegment.getStartPoint());
 
-        return !((getScalarProductOfVectors(vec_p1m, vec_p1p2) < 0)
-                || (getScalarProductOfVectors(vec_p2m, vec_p2p1) < 0));
+        return !((getScalarProductOfVectors(vec_p1m, vec_p1p2) < 0) || (getScalarProductOfVectors(vec_p2m, vec_p2p1) < 0));
     }
 
     /**
@@ -81,7 +80,7 @@ public final class AnalyticGeometry {
     }
 
     /**
-     * Если же прямые заданы точками P1(x1, y1), P2(x2, y2), M1(x3, y3), M2(x4, y4),
+     * Если прямые заданы точками P1(x1, y1), P2(x2, y2), M1(x3, y3), M2(x4, y4),
      * то условие их параллельности заключается в проверки косого произведения векторов P1P2 и M1M2:
      * если оно равно нулю, то прямые параллельны.
      * @param l1

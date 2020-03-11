@@ -20,6 +20,11 @@ public class MarkersFormer {
         this.sourceMat = sourceMat;
     }
 
+    /**
+     * 1. Преобразование векторов в массив линий с инвертированием координатных осей из-за особеннгостей OpenCV
+     * 2. Передача массива линий в класс-валидатор
+     * 3. Формирование маркеров для каждой отобранной линии
+     */
     public Mat prepareMaskOfMarkers() {
         // Создание маркерного изображения для алгоритма водоразделов
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);

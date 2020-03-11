@@ -33,13 +33,13 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
         //Применяем метод Хафа и находим все прямые линии на картинке
         algorithm = new HoughConversionAlgorithm(false, 0.1, 0.1, 25, 25, 0);
-        Mat vectorOfLines = algorithm.doAlgorithm(bordersHighlight);
+        Mat vectorOfStraightLines = algorithm.doAlgorithm(bordersHighlight);
 
         //Класс формирующий маску с маркерами.
-        MarkersFormer markersFormer = new MarkersFormer(vectorOfLines, getSourceMat());
+        MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, getSourceMat());
         Mat maskOfMarkers = markersFormer.prepareMaskOfMarkers();
         //отображаем все маркеры на картинке
-        showMarkersWithContours(maskOfMarkers, vectorOfLines);
+        showMarkersWithContours(maskOfMarkers, vectorOfStraightLines);
 
         //Методом водоразделов выделяем сегменты
         algorithm = new WatershedSegmentation(maskOfMarkers);
@@ -47,15 +47,15 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
         ShowImage.show(ImageUtils.matToImageFX(result), "Watershed");
     }
 
-    private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfLines) {
+    private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfStraightLines) {
         Mat markers = new Mat();
         maskOfMarkers.convertTo(markers, CvType.CV_8UC1);
         //ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
         //Результирующая матрица
         Mat result = new Mat(getSourceMat().size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
-        for (int i = 0, r = vectorOfLines.rows(); i < r; i++) {
-            for (int j = 0, c = vectorOfLines.cols(); j < c; j++) {
-                double[] line = vectorOfLines.get(i, j);
+        for (int i = 0, r = vectorOfStraightLines.rows(); i < r; i++) {
+            for (int j = 0, c = vectorOfStraightLines.cols(); j < c; j++) {
+                double[] line = vectorOfStraightLines.get(i, j);
                 Imgproc.line(
                         result,
                         new Point(line[0], line[1]),
