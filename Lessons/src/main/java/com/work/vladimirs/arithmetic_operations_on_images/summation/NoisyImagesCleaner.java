@@ -107,16 +107,13 @@ public class NoisyImagesCleaner {
     /**
      * Запуск
      */
-    public static class Run extends Application {
+    public static class Run {
 
         public static void main(String[] args) {
             // load the native OpenCV library
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-            launch(args);
-        }
 
-        @Override
-        public void start(Stage primaryStage) {
+            System.out.println("Start application");
             GaussNoiseAdder noiseAdder = new GaussNoiseAdder();
             try {
                 noiseAdder.createSetImages(DIR_NAME, COUNT_NOISE_IMAGES);
@@ -124,11 +121,11 @@ public class NoisyImagesCleaner {
                 System.out.println(e);
                 System.exit(0);
             }
-            System.out.println("Generation noises images are done!");
+            System.out.println("Generation noises images are done.");
 
             NoisyImagesCleaner noisyCleaner = new NoisyImagesCleaner();
             noisyCleaner.process(DIR_NAME);
-            System.out.println("Delete noise is done!");
+            System.out.println("Delete noise is done.");
             System.exit(0);
         }
     }
