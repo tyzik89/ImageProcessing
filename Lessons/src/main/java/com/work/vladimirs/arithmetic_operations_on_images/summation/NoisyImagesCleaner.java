@@ -1,4 +1,4 @@
-package com.work.vladimirs.arithmetic_image_operations.summation;
+package com.work.vladimirs.arithmetic_operations_on_images.summation;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class NoisyImagesCleaner {
 
-    private static final String DIR_NAME = "src/main/resources/NoisyImagesCleaner/";
+    private static final String DIR_NAME = "src/main/resources/arithmetic_operations_on_images/summation/NoisyImagesCleaner/";
     private static final int COUNT_NOISE_IMAGES = 50;
 
     void process(String pathToImage) {
@@ -76,10 +76,12 @@ public class NoisyImagesCleaner {
      */
     public static class GaussNoiseAdder {
 
-        void createSetImages(String pathToImage, int count) {
+        void createSetImages(String pathToImage, int count) throws Exception{
             File dir = new File(pathToImage);
             File[] files = dir.listFiles();
-            if (files == null || files.length == 0) return;
+            if (files == null || files.length == 0) {
+                throw new Exception("Files not found. Check the path.");
+            }
             for (File file : files) {
                 if (!file.isFile()) continue;
                 Mat image = Imgcodecs.imread(pathToImage + file.getName());
@@ -116,7 +118,12 @@ public class NoisyImagesCleaner {
         @Override
         public void start(Stage primaryStage) {
             GaussNoiseAdder noiseAdder = new GaussNoiseAdder();
-            noiseAdder.createSetImages(DIR_NAME, COUNT_NOISE_IMAGES);
+            try {
+                noiseAdder.createSetImages(DIR_NAME, COUNT_NOISE_IMAGES);
+            } catch (Exception e) {
+                System.out.println(e);
+                System.exit(0);
+            }
             System.out.println("Generation noises images are done!");
 
             NoisyImagesCleaner noisyCleaner = new NoisyImagesCleaner();
