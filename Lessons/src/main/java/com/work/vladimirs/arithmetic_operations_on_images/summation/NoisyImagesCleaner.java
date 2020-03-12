@@ -1,7 +1,5 @@
 package com.work.vladimirs.arithmetic_operations_on_images.summation;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
