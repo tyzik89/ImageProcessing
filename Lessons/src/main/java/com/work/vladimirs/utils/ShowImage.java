@@ -8,7 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ShowImage {
+public final class ShowImage {
 
     public static void show(Image image) {
         show(image, "");
