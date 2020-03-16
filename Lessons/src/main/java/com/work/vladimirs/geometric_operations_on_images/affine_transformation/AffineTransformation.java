@@ -13,6 +13,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Афинные пеобразования изображения
@@ -33,13 +34,14 @@ public class AffineTransformation {
             Mat image = Imgcodecs.imread(pathToImage + file.getName());
             File affineImageDir = new File(pathToImage + file.getName().replaceAll("[.]\\D*", ""));
             if (affineImageDir.mkdir()) {
-                Mat affineImage = doTransformation(image);
-                Imgcodecs.imwrite(affineImageDir.getPath() + "\\" + "affine_" + file.getName(), affineImage);
+                Mat affineChangeImage = doTransformation(image);
+                Imgcodecs.imwrite(affineImageDir.getPath() + "\\" + "affine_" + file.getName(), affineChangeImage);
             }
         }
     }
 
     private Mat doTransformation(Mat image) throws MatrixOperations.MatrixMismatchException {
+
         return new Mat();
     }
 
