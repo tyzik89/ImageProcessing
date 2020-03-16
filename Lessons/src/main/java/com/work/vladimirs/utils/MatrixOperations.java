@@ -54,11 +54,11 @@ public final class MatrixOperations {
             calcResult = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
         } else {
             int koeff = 1;
-            for(int i = 0; i < m_rows; i++){
-                if(i % 2 ==1){
+            for(int i = 0; i < m_rows; i++) {
+                if(i % 2 ==1) {
                     koeff = -1;
                 }
-                else{
+                else {
                     koeff = 1;
                 }
                 //Разложение:
@@ -77,13 +77,13 @@ public final class MatrixOperations {
         //переменные для того, чтобы "пропускать" ненужные нам строку и столбец
         int dI = 0;
         int dJ = 0;
-        for(int i = 0; i <= minorLength; i++){
+        for(int i = 0; i <= minorLength; i++) {
             dJ = 0;
             for(int j = 0; j <= minorLength; j++) {
                 if(i == row){
                     dI = 1;
                 } else {
-                    if(j == column){
+                    if (j == column) {
                         dJ = 1;
                     }
                     else {
