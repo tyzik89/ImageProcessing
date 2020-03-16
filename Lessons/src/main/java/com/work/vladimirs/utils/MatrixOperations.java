@@ -18,6 +18,22 @@ public final class MatrixOperations {
     }
 
     /**
+     * Нахождение обратной матрицы.
+     * Матрица должна быть квадратная.
+     * @param matrix исходная матрица
+     * @return обратную матрицу
+     * @throws MatrixMismatchException
+     */
+    public static double[][] inverse(double[][] matrix) throws MatrixMismatchException {
+        //Найдём определитель матрицы
+        double det_matrix = determinant(matrix);
+        if (Double.compare(det_matrix, 0.0) == 0) throw new MatrixMismatchException("Inverse matrix not exists.");
+        //Находим транспонированную матрицу алгебраических дополнений соответствующих элементов матрицы matrix
+        //fixme доделать алгоритм обратной матрицы
+        return new double[][]{};
+    }
+
+    /**
      * Транспонирование матрицы.
      * Для того чтобы транспонировать матрицу, нужно ее строки записать в столбцы транспонированной матрицы.
      * @param matrix исходная матрица
