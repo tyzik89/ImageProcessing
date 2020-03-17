@@ -33,7 +33,7 @@ public class MarkersFormer {
 
         //Делаем проверки всех полученных векторов, отбрасывая не надёжные
         LinesValidator validator = new LinesValidator(sourceMat);
-        lines = validator.validate(lines);
+        lines = validator.validateByGradient(lines);
 
         for (Line currentLine : lines) {
 

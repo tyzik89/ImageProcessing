@@ -16,7 +16,14 @@ public class LinesValidator {
         this.originalMat = originalMat;
     }
 
-    public ArrayList<Line> validate(ArrayList<Line> rawLines) {
+    //todo сделать построение гистограмм
+    public ArrayList<Line> validateByGistogram(ArrayList<Line> rawLines) {
+        ArrayList<Line> approvedLines = new ArrayList<>();
+
+        return approvedLines;
+    }
+
+    public ArrayList<Line> validateByGradient(ArrayList<Line> rawLines) {
         ArrayList<Line> approvedLines = new ArrayList<>();
 
         HashSet<Line> setAllLines = new HashSet<>(rawLines);
