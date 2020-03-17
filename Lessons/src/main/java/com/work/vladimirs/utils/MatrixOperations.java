@@ -64,14 +64,14 @@ public final class MatrixOperations {
         int m_rows = matrix.length;
         int m_cols = matrix[0].length;
 
-        if (m_rows != m_cols) throw new MatrixMismatchException("The determinant can only be calculated for a square matrix.");
+        if (m_rows != m_cols) throw new MatrixMismatchException("Can only be calculated for a square matrix.");
 
         if (m_rows == 2) {
             calcResult = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
         } else {
             int koeff = 1;
             for(int i = 0; i < m_rows; i++) {
-                if(i % 2 ==1) {
+                if(i % 2 == 1) {
                     koeff = -1;
                 }
                 else {
@@ -85,18 +85,18 @@ public final class MatrixOperations {
     }
 
     /**
-     * Получение минора матрицы
+     * Получение минора (matrix.length-1)-го порядка матрицы
      */
     private static double[][] getMinor(double[][] matrix, int row, int column) {
-        int minorLength = matrix.length-1;
+        int minorLength = matrix.length - 1;
         double[][] minor = new double[minorLength][minorLength];
         //переменные для того, чтобы "пропускать" ненужные нам строку и столбец
         int dI = 0;
         int dJ = 0;
-        for(int i = 0; i <= minorLength; i++) {
+        for (int i = 0; i <= minorLength; i++) {
             dJ = 0;
-            for(int j = 0; j <= minorLength; j++) {
-                if(i == row){
+            for (int j = 0; j <= minorLength; j++) {
+                if (i == row) {
                     dI = 1;
                 } else {
                     if (j == column) {
