@@ -10,6 +10,8 @@ public final class ImageUtils {
 
     public static final Scalar COLOR_BLACK = colorRGB(0, 0, 0);
     public static final Scalar COLOR_WHITE = colorRGB(255, 255, 255);
+    public static final Scalar COLOR_GREEN = colorRGB(0, 255, 0);
+    public static final Scalar COLOR_BLUE = colorRGB(0, 0, 255);
     public static final Scalar COLOR_RED = colorRGB(255, 0, 0);
     public static final Scalar COLOR_GRAY = colorRGB(128, 128, 128);
 

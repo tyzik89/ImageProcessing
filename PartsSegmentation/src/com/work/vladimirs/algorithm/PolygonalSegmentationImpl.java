@@ -18,7 +18,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
     public PolygonalSegmentationImpl() {
         setPathname("src/resources/");
-        setFilename("test_image_9.bmp");
+        setFilename("test_image_2.bmp");
     }
 
     @Override
