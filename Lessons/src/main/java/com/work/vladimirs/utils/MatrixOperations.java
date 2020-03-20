@@ -39,12 +39,12 @@ public final class MatrixOperations {
         double[][] minorMatrix = new double[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                double minorOfElementMatrix = determinant(getMinor(matrix, i, j));
+                double minorOfElementMatrix = (size == 2) ? getMinor(matrix, i, j)[0][0] : determinant(getMinor(matrix, i, j));
                 minorMatrix[i][j] = minorOfElementMatrix;
             }
         }
         //Находим матрицу алгебраических дополнений
-        double[][] matrixOfAlgebraicComplements = getmatrixOfAlgebraicComplements(minorMatrix);
+        double[][] matrixOfAlgebraicComplements = getMatrixOfAlgebraicComplements(minorMatrix);
         //Транспонируем матрицу алгебраических дополнений
         double[][] transposeMatrixOfAlgebraicComplements = transpose(matrixOfAlgebraicComplements);
         //Вычисляем обратную матрицу по формуле
@@ -57,13 +57,19 @@ public final class MatrixOperations {
      * @param matrix исходная матрица
      * @return матрица алгебраических дополнений
      */
-    private static double[][] getmatrixOfAlgebraicComplements(double[][] matrix) {
+    private static double[][] getMatrixOfAlgebraicComplements(double[][] matrix) {
         int coefficient;
         int size = matrix.length;
         double[][] matrixOfAlgebraicComplements = new double[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                coefficient = (i % 2 == 1) ? -1 : 1;
+                //Каждый второй элемент надо обнулять, проверяем этот элемент
+                coefficient = 1;
+                if ((i + 1) % 2 == 0) {
+                    if ((j + 1) % 2 != 0) coefficient = -1;
+                } else {
+                    if ((j + 1) % 2 == 0) coefficient = -1;
+                }
                 matrixOfAlgebraicComplements[i][j] = coefficient * matrix[i][j];
             }
         }
