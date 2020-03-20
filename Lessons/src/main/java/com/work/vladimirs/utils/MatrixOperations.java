@@ -18,19 +18,56 @@ public final class MatrixOperations {
     }
 
     /**
-     * Нахождение обратной матрицы.
+     * Нахождение обратной матрицы {A(-1)}
      * Матрица должна быть квадратная.
+     * 1. Найти определитель матрицы {det(A)}
+     * 2. Найти матрицу миноров
+     * 3. Находим матрицу алгебраических дополнений {A(*)}
+     * 4. Находим транспонированную матрицу алгебраических дополнений {A(T*)}
+     * 5. Вычисляем по формуле A(-1) = (1/det(A))*A(T*)
      * @param matrix исходная матрица
      * @return обратную матрицу
      * @throws MatrixMismatchException
      */
     public static double[][] inverse(double[][] matrix) throws MatrixMismatchException {
+        int size = matrix.length;
         //Найдём определитель матрицы
         double det_matrix = determinant(matrix);
         if (Double.compare(det_matrix, 0.0) == 0) throw new MatrixMismatchException("Inverse matrix not exists.");
         //Находим транспонированную матрицу алгебраических дополнений соответствующих элементов матрицы matrix
-        //fixme доделать алгоритм обратной матрицы
-        return new double[][]{};
+        //Находим матрицу миноров - соответствует размеру исходной матрице
+        double[][] minorMatrix = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                double minorOfElementMatrix = determinant(getMinor(matrix, i, j));
+                minorMatrix[i][j] = minorOfElementMatrix;
+            }
+        }
+        //Находим матрицу алгебраических дополнений
+        double[][] matrixOfAlgebraicComplements = getmatrixOfAlgebraicComplements(minorMatrix);
+        //Транспонируем матрицу алгебраических дополнений
+        double[][] transposeMatrixOfAlgebraicComplements = transpose(matrixOfAlgebraicComplements);
+        //Вычисляем обратную матрицу по формуле
+        double[][] result = multiplication(1 / det_matrix, transposeMatrixOfAlgebraicComplements);
+        return result;
+    }
+
+    /**
+     * Получение матрицы алгебраических дополнений
+     * @param matrix исходная матрица
+     * @return матрица алгебраических дополнений
+     */
+    private static double[][] getmatrixOfAlgebraicComplements(double[][] matrix) {
+        int coefficient;
+        int size = matrix.length;
+        double[][] matrixOfAlgebraicComplements = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                coefficient = (i % 2 == 1) ? -1 : 1;
+                matrixOfAlgebraicComplements[i][j] = coefficient * matrix[i][j];
+            }
+        }
+        return matrixOfAlgebraicComplements;
     }
 
     /**
@@ -43,7 +80,6 @@ public final class MatrixOperations {
         int m_rows = matrix.length;
         int m_cols = matrix[0].length;
         double[][] transposeMatrix = new double[m_cols][m_rows];
-
         for (int i = 0; i < m_rows; i++) {
             for (int j = 0; j < m_cols; j++) {
                 transposeMatrix[j][i] = matrix[i][j];
@@ -136,6 +172,23 @@ public final class MatrixOperations {
                     elem += m1[i][k] * m2[k][j];
                 }
                 result[i][j] = elem;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Умножение матрицы на число.
+     * @param value число
+     * @param m матрица
+     * @return матрица, умноженная на число
+     */
+    public static double[][]  multiplication(double value, double[][] m){
+        int size = m.length;
+        double[][] result = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                result[i][j] = value * m[i][j];
             }
         }
         return result;
