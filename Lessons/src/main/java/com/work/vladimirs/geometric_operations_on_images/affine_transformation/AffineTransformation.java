@@ -1,19 +1,12 @@
 package com.work.vladimirs.geometric_operations_on_images.affine_transformation;
 
 import com.work.vladimirs.utils.MatrixOperations;
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Афинные пеобразования изображения
@@ -21,7 +14,7 @@ import java.util.Arrays;
 public class AffineTransformation {
 
     private static final String DIR_NAME = "src/main/resources/geometric_operations_on_images/affine_transformation/AffineTransformation/";
-    private static final int[][] AFFINE_MATRIX = {{2, 0, 0}, {0, 2, 0}, {0, 0, 1}};
+    private static final double[][] AFFINE_MATRIX = {{2, 0, 0}, {0, 2, 0}, {0, 0, 1}};
 
     void process(String pathToImage) throws FileNotFoundException, MatrixOperations.MatrixMismatchException {
         File dir = new File(pathToImage);
@@ -32,26 +25,33 @@ public class AffineTransformation {
         for (File file : files) {
             if (!file.isFile()) continue;
             Mat image = Imgcodecs.imread(pathToImage + file.getName());
-            File affineImageDir = new File(pathToImage + file.getName().replaceAll("[.]\\D*", ""));
-            if (affineImageDir.mkdir()) {
-                Mat affineChangeImage = doTransformation(image);
-                Imgcodecs.imwrite(affineImageDir.getPath() + "\\" + "affine_" + file.getName(), affineChangeImage);
-            }
+            Mat affineChangeImage = doTransformation(image);
+            Imgcodecs.imwrite(pathToImage + "\\" + "affine_" + file.getName(), affineChangeImage);
         }
     }
 
     private Mat doTransformation(Mat image) throws MatrixOperations.MatrixMismatchException {
-
-        return new Mat();
+        int rows = image.rows();
+        int cols = image.cols();
+        Mat result = new Mat();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                //создаём вектор координат
+                double[][] vector = new double[][]{{i, j, 1}};
+                double[][] vectorResult = MatrixOperations.multiplication(vector, AFFINE_MATRIX);
+                result.put((int)vectorResult[0][0], (int)vectorResult[0][1], image.get(i, j));          //todo Доделать алгоритм афинной трансформации
+            }
+        }
+        return result;
     }
-
 
     /**
      * Запуск
      */
-    public static class Run extends Application {
+    public static class Run{
 
-        @Override
+        //todo Доделать интерфейс, для ввода значений
+       /* @Override
         public void start(Stage stage) {
             Text text = new Text("Transformations!");
             text.setLayoutY(80);
@@ -67,13 +67,12 @@ public class AffineTransformation {
             stage.setHeight(250);
             stage.centerOnScreen();
             stage.show();
-        }
+        }*/
 
         public static void main(String[] args) {
             // load the native OpenCV library
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
             //Application.launch(args);
-
             System.out.println("Start application");
 
             AffineTransformation transformation = new AffineTransformation();
