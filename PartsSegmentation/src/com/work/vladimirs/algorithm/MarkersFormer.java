@@ -26,7 +26,7 @@ public class MarkersFormer {
      * 3. Формирование маркеров для каждой отобранной линии
      */
     public Mat prepareMaskOfMarkers() {
-        // Создание маркерного изображения для алгоритма водоразделов
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
@@ -34,7 +34,7 @@ public class MarkersFormer {
         //Делаем проверки всех полученных векторов, отбрасывая не надёжные
         LinesValidator validator = new LinesValidator(sourceMat);
 //        lines = validator.validateByGradient(lines);
-        lines = validator.validateByGistogram(lines);
+        lines = validator.validateByBarChart(lines);
 
         for (Line currentLine : lines) {
 

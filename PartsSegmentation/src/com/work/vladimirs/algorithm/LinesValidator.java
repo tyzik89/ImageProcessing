@@ -20,68 +20,54 @@ public class LinesValidator {
         this.originalMat = originalMat;
     }
 
-    //todo сделать построение гистограмм
-    public ArrayList<Line> validateByGistogram(ArrayList<Line> rawLines) {
+    public ArrayList<Line> validateByBarChart(ArrayList<Line> rawLines) {
         ArrayList<Line> approvedLines = new ArrayList<>();
+
+        Mat maskWithMarker = new Mat(originalMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        createMaskWithMarker(rawLines, maskWithMarker, ImageUtils.COLOR_WHITE);
+
         //Получаем оригинальную матрицу в градациях серого
         Mat grayOriginalMat = new Mat();
         Imgproc.cvtColor(originalMat, grayOriginalMat, Imgproc.COLOR_BGR2GRAY);
         // Вычисляем гистограммы по каналам
         ArrayList<Mat> images = new ArrayList<Mat>();
-        images.add(originalMat);
         images.add(grayOriginalMat);
-
         Mat histGray = new Mat();
-        Mat histRed = new Mat();
-        Mat histGreen = new Mat();
-        Mat histBlue = new Mat();
-
-        Imgproc.calcHist(images, new MatOfInt(3), new Mat(), histGray, new MatOfInt(256), new MatOfFloat(0, 256));
-        Imgproc.calcHist(images, new MatOfInt(2), new Mat(), histRed, new MatOfInt(256), new MatOfFloat(0, 256));
-        Imgproc.calcHist(images, new MatOfInt(1), new Mat(), histGreen, new MatOfInt(256), new MatOfFloat(0, 256));
-        Imgproc.calcHist(images, new MatOfInt(0), new Mat(), histBlue, new MatOfInt(256), new MatOfFloat(0, 256));
-
+        //Вычисляем гистограмму
+        Imgproc.calcHist(images, new MatOfInt(0), maskWithMarker, histGray, new MatOfInt(256), new MatOfFloat(0, 256));
         // Нормализация диапазона
-        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
-        Core.normalize(histRed, histRed, 0, 128, Core.NORM_MINMAX);
-        Core.normalize(histGreen, histGreen, 0, 128, Core.NORM_MINMAX);
-        Core.normalize(histBlue, histBlue, 0, 128, Core.NORM_MINMAX);
-
+//        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
         // Отрисовка гистограмм
         double v = 0;
         int h = 150;
-        Mat imgHistRed = new Mat(h, 256, CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
-        Mat imgHistGreen = new Mat(h, 256, CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
-        Mat imgHistBlue = new Mat(h, 256, CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
-        Mat imgHistGray = new Mat(h, 256, CvType.CV_8UC3, ImageUtils.COLOR_WHITE);
+        Mat imgHistGray = new Mat(h, 256, CvType.CV_8UC1, ImageUtils.COLOR_WHITE);
         for (int i = 0, j = histGray.rows(); i < j; i++) {
-            v = Math.round(histRed.get(i, 0)[0]);
-            if (v != 0) {
-                Imgproc.line(imgHistRed, new Point(i, h - 1),
-                        new Point(i, h - 1 - v), ImageUtils.COLOR_RED);
-            }
-            v = Math.round(histGreen.get(i, 0)[0]);
-            if (v != 0) {
-                Imgproc.line(imgHistGreen, new Point(i, h - 1),
-                        new Point(i, h - 1 - v), ImageUtils.COLOR_GREEN);
-            }
-            v = Math.round(histBlue.get(i, 0)[0]);
-            if (v != 0) {
-                Imgproc.line(imgHistBlue, new Point(i, h - 1),
-                        new Point(i, h - 1 - v), ImageUtils.COLOR_BLUE);
-            }
             v = Math.round(histGray.get(i, 0)[0]);
             if (v != 0) {
                 Imgproc.line(imgHistGray, new Point(i, h - 1),
                         new Point(i, h - 1 - v), ImageUtils.COLOR_GRAY);
             }
         }
-        ShowImage.show(ImageUtils.matToImageFX(imgHistRed), "Red");
-        ShowImage.show(ImageUtils.matToImageFX(imgHistGreen), "Green");
-        ShowImage.show(ImageUtils.matToImageFX(imgHistBlue), "Blue");
         ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "Gray");
-
+        //System.out.println(histGray.dump());
         return approvedLines;
+    }
+
+    private void createMaskWithMarker(ArrayList<Line> lines, Mat maskWithMarker, Scalar color) {
+        //fixme Тип матрицы поменял на 32-х битную
+        // todo ВНИМАНИЕ! РЕ_ИНВЕРТИРУЕМ ОСИ КООРДИНАТ!
+        // Рисуем маркеры
+        for (Line line : lines) {
+            Point invert_start = new Point(line.getStartPoint().y, line.getStartPoint().x);
+            Point invert_end = new Point(line.getEndPoint().y, line.getEndPoint().x);
+            Imgproc.line(
+                    maskWithMarker,
+                    invert_start,
+                    invert_end,
+                    color,
+                    1,
+                    4);
+        }
     }
 
     public ArrayList<Line> validateByGradient(ArrayList<Line> rawLines) {
