@@ -2,6 +2,7 @@ package com.work.vladimirs.algorithm;
 
 import com.work.vladimirs.algorithm.entities.Line;
 import com.work.vladimirs.utils.ImageUtils;
+import com.work.vladimirs.utils.ShowImage;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -20,8 +21,8 @@ public class MarkersFormer {
     }
 
     public Mat prepareMaskOfMarkersByBarChart() {
-        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
-        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        // Создание маркерного изображения для алгоритма водоразделов. todo Необходима 32 битная матрица !!!!?????
+        Mat maskWithMarker = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
         //Создаём маску маркеров по всем найденным линиям
@@ -36,9 +37,10 @@ public class MarkersFormer {
             createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
             createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
         }
-
-        
-        return maskWithMarker;
+        ShowImage.show(ImageUtils.matToImageFX(maskWithMarker), "maskWithMarker");
+        BarChartHandler barChartHandler = new BarChartHandler(sourceMat);
+        barChartHandler.createBarChart(maskWithMarker);
+        return new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
     }
 
     /**

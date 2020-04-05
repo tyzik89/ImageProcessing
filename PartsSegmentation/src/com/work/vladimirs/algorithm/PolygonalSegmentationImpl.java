@@ -12,8 +12,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
-
 public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
     public PolygonalSegmentationImpl() {
@@ -37,7 +35,9 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
         //Класс формирующий маску с маркерами.
         MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, getSourceMat());
-        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkers();
+        //todo меняем алгоритм
+//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
+        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
         //отображаем все маркеры на картинке
         showMarkersWithContours(maskOfMarkers, vectorOfStraightLines);
 
