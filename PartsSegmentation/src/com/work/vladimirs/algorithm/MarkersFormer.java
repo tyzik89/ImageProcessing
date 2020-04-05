@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 public class MarkersFormer {
 
-    private static final double DISTANCE_BETWEEN_MARKERS_AND_LINE = 2.0;
     private static final double REDUCTION_RATIO_LENGTH = 0.2;
 
     private Mat vectorOfLines;
@@ -20,12 +19,34 @@ public class MarkersFormer {
         this.sourceMat = sourceMat;
     }
 
+    public Mat prepareMaskOfMarkersByBarChart() {
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        //Получаем все вектора ввиде массива
+        ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
+        //Создаём маску маркеров по всем найденным линиям
+        for (Line currentLine : lines) {
+            Line firstMarker = new Line();
+            Line secondMarker = new Line();
+            //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
+            findParallelMarkers(currentLine, firstMarker, secondMarker, 1.0);
+            //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
+            reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);
+            reduceMarkerLength(secondMarker, REDUCTION_RATIO_LENGTH);
+            createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+        }
+
+        
+        return maskWithMarker;
+    }
+
     /**
      * 1. Преобразование векторов в массив линий с инвертированием координатных осей из-за особеннгостей OpenCV
      * 2. Передача массива линий в класс-валидатор
      * 3. Формирование маркеров для каждой отобранной линии
      */
-    public Mat prepareMaskOfMarkers() {
+    public Mat prepareMaskOfMarkersByGradient() {
         // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
@@ -33,15 +54,14 @@ public class MarkersFormer {
 
         //Делаем проверки всех полученных векторов, отбрасывая не надёжные
         LinesValidator validator = new LinesValidator(sourceMat);
-//        lines = validator.validateByGradient(lines);
-        lines = validator.validateByBarChart(lines);
+        lines = validator.validateByGradient(lines);
 
         for (Line currentLine : lines) {
 
             Line firstMarker = new Line();
             Line secondMarker = new Line();
             //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
-            findParallelMarkers(currentLine, firstMarker, secondMarker, DISTANCE_BETWEEN_MARKERS_AND_LINE);
+            findParallelMarkers(currentLine, firstMarker, secondMarker, 2.0);
 
             //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
             reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);

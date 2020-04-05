@@ -2,13 +2,11 @@ package com.work.vladimirs.algorithm;
 
 import com.work.vladimirs.algorithm.entities.Line;
 import com.work.vladimirs.algorithm.methods.AnalyticGeometry;
-import com.work.vladimirs.utils.ColorScaleUtils;
-import com.work.vladimirs.utils.ImageUtils;
-import com.work.vladimirs.utils.ShowImage;
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Mat;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 
 public class LinesValidator {
 
@@ -18,56 +16,6 @@ public class LinesValidator {
 
     public LinesValidator(Mat originalMat) {
         this.originalMat = originalMat;
-    }
-
-    public ArrayList<Line> validateByBarChart(ArrayList<Line> rawLines) {
-        ArrayList<Line> approvedLines = new ArrayList<>();
-
-        Mat maskWithMarker = new Mat(originalMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
-        createMaskWithMarker(rawLines, maskWithMarker, ImageUtils.COLOR_WHITE);
-
-        //Получаем оригинальную матрицу в градациях серого
-        Mat grayOriginalMat = new Mat();
-        Imgproc.cvtColor(originalMat, grayOriginalMat, Imgproc.COLOR_BGR2GRAY);
-        // Вычисляем гистограммы по каналам
-        ArrayList<Mat> images = new ArrayList<Mat>();
-        images.add(grayOriginalMat);
-        Mat histGray = new Mat();
-        //Вычисляем гистограмму
-        Imgproc.calcHist(images, new MatOfInt(0), maskWithMarker, histGray, new MatOfInt(256), new MatOfFloat(0, 256));
-        // Нормализация диапазона
-//        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
-        // Отрисовка гистограмм
-        double v = 0;
-        int h = 150;
-        Mat imgHistGray = new Mat(h, 256, CvType.CV_8UC1, ImageUtils.COLOR_WHITE);
-        for (int i = 0, j = histGray.rows(); i < j; i++) {
-            v = Math.round(histGray.get(i, 0)[0]);
-            if (v != 0) {
-                Imgproc.line(imgHistGray, new Point(i, h - 1),
-                        new Point(i, h - 1 - v), ImageUtils.COLOR_GRAY);
-            }
-        }
-        ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "Gray");
-        //System.out.println(histGray.dump());
-        return approvedLines;
-    }
-
-    private void createMaskWithMarker(ArrayList<Line> lines, Mat maskWithMarker, Scalar color) {
-        //fixme Тип матрицы поменял на 32-х битную
-        // todo ВНИМАНИЕ! РЕ_ИНВЕРТИРУЕМ ОСИ КООРДИНАТ!
-        // Рисуем маркеры
-        for (Line line : lines) {
-            Point invert_start = new Point(line.getStartPoint().y, line.getStartPoint().x);
-            Point invert_end = new Point(line.getEndPoint().y, line.getEndPoint().x);
-            Imgproc.line(
-                    maskWithMarker,
-                    invert_start,
-                    invert_end,
-                    color,
-                    1,
-                    4);
-        }
     }
 
     public ArrayList<Line> validateByGradient(ArrayList<Line> rawLines) {
