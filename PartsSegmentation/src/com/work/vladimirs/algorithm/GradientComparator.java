@@ -31,7 +31,7 @@ public class GradientComparator implements Comparator<Line> {
         return Double.compare(gradientValueM1, gradientValueM2);
     }
 
-    private double findLineGradient(ArrayList<Point> pointListOfLine) {
+    public double findLineGradient(ArrayList<Point> pointListOfLine) {
         double value = 0;
         for (Point point : pointListOfLine) {
             double[] pixelChannels = originalMat.get((int) point.x, (int) point.y);

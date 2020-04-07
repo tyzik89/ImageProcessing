@@ -16,7 +16,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
     public PolygonalSegmentationImpl() {
         setPathname("src/resources/");
-        setFilename("test_image_2.bmp");
+        setFilename("test_image_2a.bmp");
     }
 
     @Override
@@ -25,7 +25,7 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
 
         Algorithm algorithm;
         //Применяем метод Кэнни
-        algorithm = new CannyEdgeDetectorAlgorithm(3, 50,3, false);
+        algorithm = new CannyEdgeDetectorAlgorithm(3, 24,3, false);
         Mat bordersHighlight = algorithm.doAlgorithm(getSourceMat());
         ShowImage.show(ImageUtils.matToImageFX(bordersHighlight), "Canny");
 

@@ -1,6 +1,5 @@
 package com.work.vladimirs.algorithm;
 
-import com.work.vladimirs.algorithm.entities.Line;
 import com.work.vladimirs.utils.ImageUtils;
 import com.work.vladimirs.utils.ShowImage;
 import org.opencv.core.*;
@@ -16,7 +15,7 @@ public class BarChartHandler {
         this.originalMat = originalMat;
     }
 
-    public void createBarChart(Mat maskWithMarker) {
+    public Mat createBarChart(Mat maskWithMarker) {
         //Получаем оригинальную матрицу в градациях серого
         Mat grayOriginalMat = new Mat();
         Imgproc.cvtColor(originalMat, grayOriginalMat, Imgproc.COLOR_BGR2GRAY);
@@ -31,7 +30,7 @@ public class BarChartHandler {
 //        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
         // Отрисовка гистограмм
         double v = 0;
-        int h = 500;
+        int h = 800;
         Mat imgHistGray = new Mat(h, 256, CvType.CV_8UC1, ImageUtils.COLOR_WHITE);
         for (int i = 0, j = histGray.rows(); i < j; i++) {
             v = Math.round(histGray.get(i, 0)[0]);
@@ -41,7 +40,8 @@ public class BarChartHandler {
             }
         }
         ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "Gray");
-        System.out.println(histGray.dump());
+        //System.out.println(histGray.dump());
+        return histGray;
     }
 
 }

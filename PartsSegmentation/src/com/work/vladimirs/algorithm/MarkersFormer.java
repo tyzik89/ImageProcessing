@@ -7,6 +7,9 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MarkersFormer {
 
@@ -21,11 +24,14 @@ public class MarkersFormer {
     }
 
     public Mat prepareMaskOfMarkersByBarChart() {
-        // Создание маркерного изображения для алгоритма водоразделов. todo Необходима 32 битная матрица !!!!?????
-        Mat maskWithMarker = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        // Создание маркерного изображения для гистограммы.
+        Mat maskWithMarkerForBarChart = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
         //Создаём маску маркеров по всем найденным линиям
+        //Все маркеры заносим в карту градиента маркеров
+        Map<Double, ArrayList<Line>> gradientOfLinesArrayMap = new HashMap<>();
+        GradientComparator gradientComparator = new GradientComparator(sourceMat);
         for (Line currentLine : lines) {
             Line firstMarker = new Line();
             Line secondMarker = new Line();
@@ -34,13 +40,51 @@ public class MarkersFormer {
             //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
             reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);
             reduceMarkerLength(secondMarker, REDUCTION_RATIO_LENGTH);
-            createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
-            createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(firstMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(secondMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
+
+            //Находим градиент маркеров и помещаем их в мапу
+            double firstMarkerGradient = gradientComparator.findLineGradient(firstMarker.getInnerPoints());
+            double secondMarkerGradient = gradientComparator.findLineGradient(secondMarker.getInnerPoints());
+//            System.out.println(firstMarkerGradient + " " + secondMarkerGradient);
+            ArrayList<Line> al1 = gradientOfLinesArrayMap.get(firstMarkerGradient);
+            if (al1 == null) {
+                gradientOfLinesArrayMap.put(firstMarkerGradient, new ArrayList<Line>(){{add(firstMarker);}});
+            } else {
+                al1.add(firstMarker);
+            }
+            ArrayList<Line> al2 = gradientOfLinesArrayMap.get(secondMarkerGradient);
+            if (al2 == null) {
+                gradientOfLinesArrayMap.put(secondMarkerGradient, new ArrayList<Line>(){{add(secondMarker);}});
+            } else {
+                al2.add(secondMarker);
+            }
         }
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarker), "maskWithMarker");
+        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkerForBarChart), "maskWithMarkerForBarChart");
         BarChartHandler barChartHandler = new BarChartHandler(sourceMat);
-        barChartHandler.createBarChart(maskWithMarker);
-        return new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        Mat histogramm = barChartHandler.createBarChart(maskWithMarkerForBarChart);
+
+        int countMods = 0;
+        for (int i = 0; i < histogramm.rows(); i++) {
+            double val = histogramm.get(i, 0)[0];
+            if (val > 0) {
+                countMods++;
+                System.out.println(i + ": " + val);
+            }
+        }
+
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        int color = 80;
+        for (Double aDouble : gradientOfLinesArrayMap.keySet()) {
+            ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+            for (Line line : a) {
+                createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
+            }
+            color += 20;
+        }
+
+        return maskWithMarker;
     }
 
     /**
