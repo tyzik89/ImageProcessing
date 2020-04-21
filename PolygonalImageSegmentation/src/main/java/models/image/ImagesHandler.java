@@ -16,6 +16,7 @@ import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
+import utils.ShowImage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -177,30 +178,29 @@ public class ImagesHandler implements Observable {
     }
 
     public void doWatershedSegmentationAutoMode() {
-        Mat vectorOfLines = StorageMatrix.getInstance().getMatrixOfLines();
+        Mat vectorOfStraightLines = StorageMatrix.getInstance().getMatrixOfLines();
         Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
 
-        double distanceOfMarkers = 2.0;
-        double ratioLength = 0.2;
-
-        MarkersFormer markersFormer = new MarkersFormer(vectorOfLines, matCurr, distanceOfMarkers, ratioLength);
-        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkers();
-        //отображаем все маркеры на экране
-        showMarkersWithContours(maskOfMarkers, vectorOfLines, matCurr);
+        MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, matCurr);
+        //todo меняем алгоритм
+        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
+//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
+        //отображаем все маркеры на картинке
+        showMarkersWithContours(maskOfMarkers, vectorOfStraightLines, matCurr);
 
         //Методом водоразделов выделяем сегменты
         doMakeAlgorithm(new WatershedSegmentation(maskOfMarkers, matCurr));
     }
 
-    private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfLines, Mat sourceMat) {
+    private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfStraightLines, Mat sourceMat) {
         Mat markers = new Mat();
         maskOfMarkers.convertTo(markers, CvType.CV_8UC1);
         //ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
         //Результирующая матрица
         Mat result = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
-        for (int i = 0, r = vectorOfLines.rows(); i < r; i++) {
-            for (int j = 0, c = vectorOfLines.cols(); j < c; j++) {
-                double[] line = vectorOfLines.get(i, j);
+        for (int i = 0, r = vectorOfStraightLines.rows(); i < r; i++) {
+            for (int j = 0, c = vectorOfStraightLines.cols(); j < c; j++) {
+                double[] line = vectorOfStraightLines.get(i, j);
                 Imgproc.line(
                         result,
                         new Point(line[0], line[1]),
@@ -211,7 +211,6 @@ public class ImagesHandler implements Observable {
             }
         }
         markers.copyTo(result, markers);
-        storageImages.setTempImage(ImageUtils.matToImageFX(result));
-        notifyObservers(NotifyConstants.TEMP_IMAGE_READY);
+        ShowImage.show(ImageUtils.matToImageFX(result), "Markers");
     }
 }

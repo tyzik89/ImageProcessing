@@ -102,7 +102,7 @@
                                 <Label layoutX="7.0" layoutY="73.0" text="Разрешения:" AnchorPane.leftAnchor="0.0" />
                                 <Spinner fx:id="spinnerHoughDistance" editable="true" layoutX="152.0" layoutY="93.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0">
                                     <valueFactory>
-                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.1" max="1000" min="0.0" />
                                     </valueFactory>
                                     <tooltip>
                                         <Tooltip text="В векторе (r,θ), хранящем обнаруженные линии &#10;- это разрешение параметра r в пикселях" />
@@ -110,7 +110,7 @@
                                 </Spinner>
                                 <Spinner fx:id="spinnerHoughAngle" editable="true" layoutX="153.0" layoutY="130.0" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="0.0">
                                     <valueFactory>
-                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.0" max="1000" min="0.0" />
+                                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="0.1" initialValue="0.1" max="1000" min="0.0" />
                                     </valueFactory>
                                     <tooltip>
                                         <Tooltip text="В векторе (r,θ), хранящем обнаруженные линии &#10;- это разрешение параметра θ в радианах" />
