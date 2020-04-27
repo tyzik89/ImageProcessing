@@ -37,7 +37,12 @@ public class PolygonalSegmentationImpl extends PolygonalSegmentation {
         MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, getSourceMat());
         //todo меняем алгоритм
 //        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
-        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
+//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
+        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByKMeans();
+
+
+
+
         //отображаем все маркеры на картинке
         showMarkersWithContours(maskOfMarkers, vectorOfStraightLines);
 
