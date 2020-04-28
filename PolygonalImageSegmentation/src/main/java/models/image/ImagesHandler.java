@@ -1,6 +1,5 @@
 package models.image;
 
-import models.notifications.constants.NotifyConstants;
 import fxelements.SingletonProcess;
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -10,6 +9,7 @@ import models.algorithms.Algorithm;
 import models.algorithms.*;
 import models.notifications.Observable;
 import models.notifications.Observer;
+import models.notifications.constants.NotifyConstants;
 import models.services.MarkersFormer;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -53,6 +53,7 @@ public class ImagesHandler implements Observable {
         Image image = new Image(localUrl);
 
         storageImages.init(image);
+        storageMatrix.setSourceMat(file.toString());
 
         notifyObservers(NotifyConstants.IMAGE_LOADED);
     }
@@ -108,6 +109,10 @@ public class ImagesHandler implements Observable {
 
     public Image getSourceImage() {
         return storageImages.getSourceImage();
+    }
+
+    public Mat getSourceMat() {
+        return storageMatrix.getSourceMat();
     }
 
     public Image getTempImage() {
@@ -179,12 +184,16 @@ public class ImagesHandler implements Observable {
 
     public void doWatershedSegmentationAutoMode() {
         Mat vectorOfStraightLines = StorageMatrix.getInstance().getMatrixOfLines();
-        Mat matCurr = ImageUtils.imageFXToMat(this.getSourceImage());
+        Mat matCurr = getSourceMat();
 
         MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, matCurr);
-        //todo меняем алгоритм
-        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
+
+        //todo тут пока меняем алгоритм
+//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
 //        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
+        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByKMeans();
+        //todo тут пока меняем алгоритм
+
         //отображаем все маркеры на картинке
         showMarkersWithContours(maskOfMarkers, vectorOfStraightLines, matCurr);
 
@@ -195,7 +204,7 @@ public class ImagesHandler implements Observable {
     private void showMarkersWithContours(Mat maskOfMarkers, Mat vectorOfStraightLines, Mat sourceMat) {
         Mat markers = new Mat();
         maskOfMarkers.convertTo(markers, CvType.CV_8UC1);
-        //ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
+//        ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
         //Результирующая матрица
         Mat result = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         for (int i = 0, r = vectorOfStraightLines.rows(); i < r; i++) {
@@ -211,6 +220,6 @@ public class ImagesHandler implements Observable {
             }
         }
         markers.copyTo(result, markers);
-        ShowImage.show(ImageUtils.matToImageFX(result), "Markers");
+        ShowImage.show(ImageUtils.matToImageFX(result), "LinesWithOurMarkers");
     }
 }

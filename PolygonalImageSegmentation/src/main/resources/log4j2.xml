@@ -19,11 +19,18 @@
         <File name="Algorithms-File-Appender" fileName="${log-path}/algorithms_log.log" >
             <PatternLayout pattern="${sys:FILE_LOG_PATTERN}" />
         </File>
+        <File name="Services-File-Appender" fileName="${log-path}/services_log.log" >
+            <PatternLayout pattern="${sys:FILE_LOG_PATTERN}" />
+        </File>
     </Appenders>
 
     <Loggers>
         <Logger name="models.algorithms" level="debug">
             <AppenderRef ref="Algorithms-File-Appender"/>
+        </Logger>
+
+        <Logger name="models.services" level="debug">
+            <AppenderRef ref="Services-File-Appender"/>
         </Logger>
 
         <Logger name="controllers" level="debug">

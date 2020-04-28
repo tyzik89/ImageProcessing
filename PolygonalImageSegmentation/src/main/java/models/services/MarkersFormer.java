@@ -1,20 +1,27 @@
 package models.services;
 
 import models.entities.Line;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
 import utils.ShowImage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MarkersFormer {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(MarkersFormer.class);
+
+    private static final double DISTANCE_BETWEEN_MARKERS_AND_LINE = 1.0;
     private static final double REDUCTION_RATIO_LENGTH = 0.2;
-    private static final double COUNT_PIXELS_THRESHOLD = 0;
+    private static final double BRITHNESS_PIXELS_THRESHOLD = 0;
+    private static final int KMEANS_ATTEMPTS = 20;
+    private static final int KMEANS_CLUSTERS = 4;
 
     private Mat vectorOfLines;
     private Mat sourceMat;
@@ -24,25 +31,115 @@ public class MarkersFormer {
         this.sourceMat = sourceMat;
     }
 
-    public Mat prepareMaskOfMarkersByBarChart() {
-        // Создание маркерного изображения для гистограммы.
-        Mat maskWithMarkerForBarChart = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
-        //Получаем все вектора ввиде массива
-        ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
-        //Создаём маску маркеров по всем найденным линиям
+
+    public Mat prepareMaskOfMarkersByKMeans() {
+        // Создание маркерного изображения для метода k-средних
+        Mat maskWithMarkers = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Все маркеры заносим в карту градиента маркеров
         Map<Double, ArrayList<Line>> gradientOfLinesArrayMap = new HashMap<>();
+
+        //Получаем все вектора ввиде массива
+        ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
+
+        //Создаём маску с маркерами и карту: градиент-маркеры.
+        createMaskWithMarkerAndGradientMap(lines, maskWithMarkers, gradientOfLinesArrayMap);
+
+        //Матрица с маркерами, которые содержат яркость пикселей оригинала
+        Mat maskWithMarkersOriginalImage = new Mat();
+        //Копируем все маркерные пиксели из оригинала в нашу маркерную матрицу
+        sourceMat.copyTo(maskWithMarkersOriginalImage, maskWithMarkers);
+
+        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersOriginalImage), "maskWithMarkersOriginalImage");
+
+        //Преобразовываем маркерную матрицу в матрицу типа CV_32F для метода KMeans
+        Mat data = maskWithMarkersOriginalImage.reshape(1, maskWithMarkersOriginalImage.rows() * maskWithMarkersOriginalImage.cols() * maskWithMarkersOriginalImage.channels());
+        data.convertTo(data, CvType.CV_32F, 1.0 / 255);
+
+        //Применяем метод к-средних
+        Mat bestLabels = new Mat();
+        Mat centers = new Mat();
+        TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS, 10, 1);
+        Core.kmeans(data, KMEANS_CLUSTERS , bestLabels, criteria, KMEANS_ATTEMPTS, Core.KMEANS_RANDOM_CENTERS, centers);
+
+        //Получаем центры кластеров, т.е. преобладания яркостей
+        Mat colors = new Mat();
+        centers.t().convertTo(colors, CvType.CV_8U, 255);
+        LOGGER.debug("Colors.dump: {}", colors.dump());
+
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        //Бежим по карте яркость-маркер
+        int color = 80;
+        for (Double aDouble : gradientOfLinesArrayMap.keySet()) {
+            //Яркость каждого маркера проверяем на принадлежность к какому-либо кластеру, иначе отбрасываем
+            LOGGER.debug("aDouble: {}", aDouble);
+            for (int i = 0; i < colors.cols(); i++) {
+                double delta = Math.abs(colors.get(0, i)[0] - aDouble);
+                if (delta <= BRITHNESS_PIXELS_THRESHOLD) {
+                    ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+                    for (Line line : a) {
+                        createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
+                    }
+                    color += 20;
+                    break;
+                }
+            }
+
+        }
+        return maskWithMarker;
+    }
+
+    public Mat prepareMaskOfMarkersByBarChart() {
+        // Создание маркерного изображения для гистограммы.
+        Mat maskWithMarkers = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        // Создаём карту градиентво маркеров
+        Map<Double, ArrayList<Line>> gradientOfLinesArrayMap = new HashMap<>();
+
+        //Получаем все вектора ввиде массива
+        ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
+
+        //Создаём маску с маркерами и карту градиент-маркеры.
+        createMaskWithMarkerAndGradientMap(lines, maskWithMarkers, gradientOfLinesArrayMap);
+
+        BarChartHandler barChartHandler = new BarChartHandler(sourceMat);
+        Mat histogramm = barChartHandler.createBarChart(maskWithMarkers);
+        List<String> values = new ArrayList<>();
+        for (int i = 0; i < histogramm.rows(); i++) {
+            int val = (int) histogramm.get(i, 0)[0];
+            if (val > 0) {
+                values.add(i + ": " + val);
+            }
+        }
+        LOGGER.debug("Итог гистограммы (яркость: кол-во пикселей): {}", values);
+
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
+        Mat maskWithMarkerForWatershed = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        int color = 80;
+        for (Double aDouble : gradientOfLinesArrayMap.keySet()) {
+            ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+            for (Line line : a) {
+                createMaskWithMarker(line, maskWithMarkerForWatershed, Scalar.all(color));
+            }
+            color += 20;
+        }
+
+        return maskWithMarkerForWatershed;
+    }
+
+
+    private void createMaskWithMarkerAndGradientMap(ArrayList<Line> lines, Mat maskWithMarker, Map<Double, ArrayList<Line>> gradientOfLinesArrayMap) {
         GradientComparator gradientComparator = new GradientComparator(sourceMat);
+        //Бежим по всем найденным линиям  и создаём маску маркеров
         for (Line currentLine : lines) {
             Line firstMarker = new Line();
             Line secondMarker = new Line();
             //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
-            findParallelMarkers(currentLine, firstMarker, secondMarker, 1.0);
+            findParallelMarkers(currentLine, firstMarker, secondMarker, DISTANCE_BETWEEN_MARKERS_AND_LINE);
             //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
             reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);
             reduceMarkerLength(secondMarker, REDUCTION_RATIO_LENGTH);
-            createMaskWithMarker(firstMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
-            createMaskWithMarker(secondMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(firstMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
 
             //Находим градиент маркеров и помещаем их в мапу
             double firstMarkerGradient = gradientComparator.findLineGradient(firstMarker.getInnerPoints());
@@ -61,37 +158,11 @@ public class MarkersFormer {
                 al2.add(secondMarker);
             }
         }
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkerForBarChart), "maskWithMarkerForBarChart");
-        BarChartHandler barChartHandler = new BarChartHandler(sourceMat);
-        Mat histogramm = barChartHandler.createBarChart(maskWithMarkerForBarChart);
-        int countMods = 0;
-        List<Integer> values = new ArrayList<>();
-        for (int i = 0; i < histogramm.rows(); i++) {
-            double val = histogramm.get(i, 0)[0];
-            if (val > COUNT_PIXELS_THRESHOLD) {
-                countMods++;
-                System.out.println(i + ": " + val);
-                values.add(i);
-            }
-        }
-        System.out.println("Кластеры: " + Arrays.toString(values.toArray()) + "\nКол-во кластеров: " + values.size());
-
-        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
-        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
-        int color = 80;
-        for (Double aDouble : gradientOfLinesArrayMap.keySet()) {
-            ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
-            for (Line line : a) {
-                createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
-            }
-            color += 20;
-        }
-
-        return maskWithMarker;
     }
 
+
     /**
-     * 1. Преобразование векторов в массив линий с инвертированием координатных осей из-за особеннгостей OpenCV
+     * 1. Преобразование векторов в массив линий с инвертированием координатных осей из-за особенностей OpenCV
      * 2. Передача массива линий в класс-валидатор
      * 3. Формирование маркеров для каждой отобранной линии
      */
@@ -110,7 +181,7 @@ public class MarkersFormer {
             Line firstMarker = new Line();
             Line secondMarker = new Line();
             //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
-            findParallelMarkers(currentLine, firstMarker, secondMarker, 2.0);
+            findParallelMarkers(currentLine, firstMarker, secondMarker, DISTANCE_BETWEEN_MARKERS_AND_LINE);
 
             //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
             reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);

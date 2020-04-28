@@ -1,6 +1,5 @@
 package controllers;
 
-import models.notifications.constants.NotifyConstants;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.image.ImagesHandler;
 import models.notifications.Observer;
+import models.notifications.constants.NotifyConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -148,7 +148,7 @@ public class RootLayoutController {
 
         File selectedFile = fileChooser.showOpenDialog(mainApp.getPrimaryStage().getOwner());
         if (selectedFile != null && selectedFile.exists())
-        //TODO UNCOMMENT FINAL
+        //TODO если необходимо загрузить сразу
 //        File selectedFile = new File("src/main/resources/img/test_image_2a.bmp");
             imagesHandler.load(selectedFile);
     }

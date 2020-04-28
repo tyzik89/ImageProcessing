@@ -27,20 +27,20 @@ public class BarChartHandler {
         //Вычисляем гистограмму
         Imgproc.calcHist(images, new MatOfInt(0), maskWithMarker, histGray, new MatOfInt(256), new MatOfFloat(0, 256));
         // Нормализация диапазона
-//        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
+        Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
         // Отрисовка гистограмм
         double v = 0;
-        int h = 1000;
+        int h = 150;
         //Палитра белого цвета для отображения гистограммы
         Mat imgHistGray = new Mat(h, 256, CvType.CV_8UC1, ImageUtils.COLOR_WHITE);
         for (int i = 0, j = histGray.rows(); i < j; i++) {
             v = Math.round(histGray.get(i, 0)[0]);
             if (v != 0) {
                 Imgproc.line(imgHistGray, new Point(i, h - 1),
-                        new Point(i, h - 1 - v), ImageUtils.COLOR_GRAY);
+                        new Point(i, h - 1 - v), ImageUtils.COLOR_BLACK);
             }
         }
-        ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "Gray");
+        ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "BarChart");
 
 //        System.out.println(histGray.dump());
         return histGray;
