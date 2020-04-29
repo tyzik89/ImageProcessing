@@ -35,7 +35,8 @@ public class GradientComparator implements Comparator<Line> {
         double value = 0;
         for (Point point : pointListOfLine) {
             double[] pixelChannels = originalMat.get((int) point.x, (int) point.y);
-            double brightnessPixel = (pixelChannels[0] + pixelChannels[1] + pixelChannels[2]) / 3;
+            double brightnessPixel = originalMat.channels() == 1 ? pixelChannels[0]   //Для изображения в оттенках серого
+                    : (pixelChannels[0] + pixelChannels[1] + pixelChannels[2]) / 3;   //Для цветного изображения
             value += brightnessPixel;
         }
         return value / pointListOfLine.size();

@@ -28,7 +28,7 @@ public class MarkersFormer {
      *
      */
     public Mat prepareMaskOfMarkersByKMeans() {
-        // Создание маркерного изображения
+        // Создание маркерного изображения для метода k-средних
         Mat maskWithMarkersForKMeans = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
@@ -69,8 +69,10 @@ public class MarkersFormer {
         Mat maskWithMarkersOriginalImage = new Mat();
         //Копируем все маркерные пиксели с оригинала в нашу маркерную матрицу
         sourceMat.copyTo(maskWithMarkersOriginalImage, maskWithMarkersForKMeans);
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersOriginalImage), "maskWithMarkersOriginalImage");
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersForKMeans), "maskWithMarkersForKMeans)");
+
+//        ShowImage.show(ImageUtils.matToImageFX(sourceMat), "sourceMat");
+//        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersOriginalImage), "maskWithMarkersOriginalImage");
+//        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersForKMeans), "maskWithMarkersForKMeans");
         //Преобразовываем маркерную матрицу в матрицу типа CV_32F для метода KMeans
         Mat data = maskWithMarkersOriginalImage.reshape(1, maskWithMarkersOriginalImage.rows() * maskWithMarkersOriginalImage.cols() * maskWithMarkersOriginalImage.channels());
         data.convertTo(data, CvType.CV_32F, 1.0 / 255);

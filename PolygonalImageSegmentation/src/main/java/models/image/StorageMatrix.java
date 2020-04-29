@@ -35,7 +35,8 @@ public class StorageMatrix {
     }
 
     public void setSourceMat(String path) {
-        sourceMat = Imgcodecs.imread(path);
+        //todo ЗАГРУЗКА ИЗОБРАЖЕНИЯ В МАТРИЦУ В ОТТЕНКАХ СЕРОГО!
+        sourceMat = Imgcodecs.imread(path, Imgcodecs.IMREAD_GRAYSCALE);
         if (sourceMat.empty()) {
             System.out.println("Не удалось загрузить изображение");
         }
