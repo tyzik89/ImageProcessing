@@ -82,7 +82,7 @@
                     <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <Tab text="Линии">
                             <AnchorPane>
-                                <RadioButton fx:id="radiobHoughClassic" layoutX="46.0" layoutY="26.0" mnemonicParsing="false" onAction="#changeRadioButtonHoughClassic" selected="true" text="классический" AnchorPane.leftAnchor="0.0">
+                                <RadioButton fx:id="radiobHoughClassic" layoutX="46.0" layoutY="26.0" mnemonicParsing="false" onAction="#changeRadioButtonHoughClassic" selected="false" text="классический" AnchorPane.leftAnchor="0.0">
                                     <tooltip>
                                         <Tooltip text="Классический метод трансформации Хафа.&#10;Каждая линия представляется двумя числами типа float (rho, theta), &#10;где rho — дистанция между точкой (0,0) и линией, &#10;а theta — угол между осью x и нормалью к линии (т.е. матрица должна иметь тип of CV_32FC2)" />
                                     </tooltip>
@@ -127,7 +127,7 @@
                                 <Separator layoutX="-1.0" layoutY="253.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                                 <Accordion AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="257.0">
                                     <panes>
-                                        <TitledPane fx:id="titledPaneHoughClassic" animated="true" disable="false" expanded="true" text="Классический. Параметры.">
+                                        <TitledPane fx:id="titledPaneHoughClassic" animated="true" disable="true" expanded="true" text="Классический. Параметры.">
                                             <AnchorPane>
                                                 <Label layoutX="17.0" layoutY="9.0" text="Делитель для расстояния:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="9.0" />
                                                 <Label layoutX="56.0" layoutY="48.0" text="Делитель для угла:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="48.0" />
@@ -191,7 +191,47 @@
 
             <TitledPane fx:id="watershedTools" animated="false" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Сегментация по &quot;Водоразделам&quot;">
                 <AnchorPane>
-                    <Button layoutX="12.0" layoutY="82.0" mnemonicParsing="false" onAction="#handleApplyWatershed" text="Применить" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                    <AnchorPane fx:id="anchorPaneRadioButtonMarker" disable="true" layoutX="15.0" layoutY="63.0">
+                        <RadioButton fx:id="radiobGradient" layoutX="13.0" layoutY="75.0" mnemonicParsing="false" onAction="#changeRadioButtonGradient" selected="false" text="По градиенту" AnchorPane.leftAnchor="13.0">
+                            <tooltip>
+                                <Tooltip text="" />
+                            </tooltip>
+                            <toggleGroup>
+                                <ToggleGroup fx:id="toggleGroupMarker" />
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="radiobKMeans" layoutX="13.0" layoutY="98.0" mnemonicParsing="false" onAction="#changeRadioButtonKMeans" selected="false" text="Кластеризацией к-средних" toggleGroup="$toggleGroupMarker" AnchorPane.leftAnchor="13.0">
+                            <tooltip>
+                                <Tooltip text="" />
+                            </tooltip>
+                        </RadioButton>
+                        <RadioButton fx:id="radiobHistogramm" layoutX="13.0" layoutY="121.0" mnemonicParsing="false" onAction="#changeRadioButtonHistogramm" selected="false" text="Построением гистограммы" toggleGroup="$toggleGroupMarker" AnchorPane.leftAnchor="13.0">
+                            <tooltip>
+                                <Tooltip text="" />
+                            </tooltip>
+                        </RadioButton>
+                  <Label layoutX="16.0" layoutY="44.0" prefHeight="17.0" prefWidth="243.0" text="Автоматическая расстановка маркеров:" />
+                    </AnchorPane>
+                        <Button layoutX="19.2" layoutY="490.0" mnemonicParsing="false" onAction="#handleApplyWatershed" prefHeight="25.0" prefWidth="250.0" text="Применить" AnchorPane.leftAnchor="19.2" AnchorPane.rightAnchor="19.200000000000102" />
+                   <Accordion fx:id="accordionMarkerMethodsParams" disable="true" layoutX="23.0" layoutY="217.0" prefHeight="256.0" prefWidth="271.0">
+                     <panes>
+                       <TitledPane fx:id="titledPaneGradientParams" animated="true" disable="true" text="По градиенту: параметры">
+                         <content>
+                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                         </content>
+                       </TitledPane>
+                       <TitledPane fx:id="titledPaneKMeansParams" animated="true" disable="true" expanded="false" text="K-средних: параметры">
+                         <content>
+                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                         </content>
+                       </TitledPane>
+                       <TitledPane fx:id="titledPaneHistogrammParams" animated="true" disable="true" expanded="false" text="Гистограмма: параметры">
+                         <content>
+                           <AnchorPane />
+                         </content>
+                       </TitledPane>
+                     </panes>
+                   </Accordion>
                     <ToggleButton fx:id="watershedMode" layoutX="90.0" layoutY="25.0" mnemonicParsing="false" onAction="#handleWatershedMode" text="Ручной режим" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                         <tooltip>
                             <Tooltip text="Режим расстановки маркеров на изображении" />

@@ -30,6 +30,7 @@ public class AlgorithmMenuLayoutController implements Observer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AlgorithmMenuLayoutController.class);
 
+
     //Ref on model class - ImagesHandler
     private ImagesHandler imagesHandler;
 
@@ -93,6 +94,32 @@ public class AlgorithmMenuLayoutController implements Observer {
     private Spinner spinnerHoughProbablyMinLineLength;
     @FXML
     private ToggleButton watershedMode;
+
+    //Формирование маркеров для алгоритма водоразделов
+    @FXML
+    private RadioButton radiobGradient;
+    @FXML
+    private RadioButton radiobKMeans;
+    @FXML
+    private RadioButton radiobHistogramm;
+
+    @FXML
+    private ToggleGroup toggleGroupMarker;
+
+    @FXML
+    public TitledPane titledPaneHistogrammParams;
+    @FXML
+    public TitledPane titledPaneKMeansParams;
+    @FXML
+    public TitledPane titledPaneGradientParams;
+
+    @FXML
+    public Accordion accordionMarkerMethodsParams;
+    @FXML
+    public AnchorPane anchorPaneRadioButtonMarker;
+
+    //Формирование маркеров для алгоритма водоразделов
+
 
     public AlgorithmMenuLayoutController(ImagesHandler imagesHandler) {
         // контролер должен знать модель
@@ -218,6 +245,51 @@ public class AlgorithmMenuLayoutController implements Observer {
     }
 
     @FXML
+    private void changeRadioButtonGradient(ActionEvent event) {
+        radiobGradient.setSelected(true);
+        titledPaneGradientParams.setDisable(false);
+        titledPaneGradientParams.setExpanded(true);
+
+        radiobHistogramm.setSelected(false);
+        titledPaneHistogrammParams.setDisable(true);
+        titledPaneHistogrammParams.setExpanded(false);
+
+        radiobKMeans.setSelected(false);
+        titledPaneKMeansParams.setDisable(true);
+        titledPaneKMeansParams.setExpanded(false);
+    }
+
+    @FXML
+    private void changeRadioButtonKMeans(ActionEvent event) {
+        radiobGradient.setSelected(false);
+        titledPaneGradientParams.setDisable(true);
+        titledPaneGradientParams.setExpanded(false);
+
+        radiobHistogramm.setSelected(false);
+        titledPaneHistogrammParams.setDisable(true);
+        titledPaneHistogrammParams.setExpanded(false);
+
+        radiobKMeans.setSelected(true);
+        titledPaneKMeansParams.setDisable(false);
+        titledPaneKMeansParams.setExpanded(true);
+    }
+
+    @FXML
+    private void changeRadioButtonHistogramm(ActionEvent event) {
+        radiobGradient.setSelected(false);
+        titledPaneGradientParams.setDisable(true);
+        titledPaneGradientParams.setExpanded(false);
+
+        radiobHistogramm.setSelected(true);
+        titledPaneHistogrammParams.setDisable(false);
+        titledPaneHistogrammParams.setExpanded(true);
+
+        radiobKMeans.setSelected(false);
+        titledPaneKMeansParams.setDisable(true);
+        titledPaneKMeansParams.setExpanded(false);
+    }
+
+    @FXML
     private void changeThresholdHough() {
         thresholdHoughLabel.setText(String.valueOf((int) thresholdHoughSlider.getValue()));
     }
@@ -226,8 +298,12 @@ public class AlgorithmMenuLayoutController implements Observer {
     private void handleWatershedMode(ActionEvent event) {
         if (watershedMode.isSelected()) {
             watershedMode.setText("Автоматический режим");
+            accordionMarkerMethodsParams.setDisable(false);
+            anchorPaneRadioButtonMarker.setDisable(false);
         } else {
             watershedMode.setText("Ручной режим");
+            accordionMarkerMethodsParams.setDisable(true);
+            anchorPaneRadioButtonMarker.setDisable(true);
         }
     }
 
