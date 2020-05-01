@@ -32,6 +32,8 @@ public class MarkersFormer {
 
 
     public Mat prepareMaskOfMarkersByKMeans(double brithnessPixelsThresholdKMeans, int countIterationsKMeans, int countClustersKMeans) {
+        LOGGER.debug("prepareMaskOfMarkersByKMeans() start");
+        LOGGER.debug("brithnessPixelsThresholdKMeans: {}, countIterationsKMeans: {}, countClustersKMeans: {}", brithnessPixelsThresholdKMeans, countIterationsKMeans, countClustersKMeans);
         // Создание маркерного изображения для метода k-средних
         Mat maskWithMarkers = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Все маркеры заносим в карту градиента маркеров
@@ -59,7 +61,8 @@ public class MarkersFormer {
         Mat centers = new Mat();
         TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS, 10, 1);
         //fixme countClustersKMeans + 1 т.к. учавствует изображение полностью чёрное с маркерами в серых градациях, т.о. получается всплеск в области чёрного - это отдельный кластер
-        Core.kmeans(data, countClustersKMeans + 1, bestLabels, criteria, countIterationsKMeans, Core.KMEANS_RANDOM_CENTERS, centers);
+        countClustersKMeans++;
+        Core.kmeans(data, countClustersKMeans, bestLabels, criteria, countIterationsKMeans, Core.KMEANS_PP_CENTERS, centers);
 
         //Получаем центры кластеров, т.е. преобладания яркостей
         Mat colors = new Mat();
@@ -75,7 +78,7 @@ public class MarkersFormer {
             LOGGER.debug("aDouble: {}", aDouble);
             for (int i = 0; i < colors.cols(); i++) {
                 double delta = Math.abs(colors.get(0, i)[0] - aDouble);
-                if (delta <= brithnessPixelsThresholdKMeans) {
+                if (Double.compare(brithnessPixelsThresholdKMeans, delta) != -1) {
                     ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
                     for (Line line : a) {
                         createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
@@ -86,6 +89,12 @@ public class MarkersFormer {
             }
 
         }
+        maskWithMarkersOriginalImage.release();
+        bestLabels.release();
+        centers.release();
+        colors.release();
+        data.release();
+
         return maskWithMarker;
     }
 
