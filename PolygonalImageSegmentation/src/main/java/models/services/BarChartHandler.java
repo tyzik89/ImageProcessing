@@ -18,7 +18,11 @@ public class BarChartHandler {
     public Mat createBarChart(Mat maskWithMarker) {
         //Получаем оригинальную матрицу в градациях серого
         Mat grayOriginalMat = new Mat();
-        Imgproc.cvtColor(originalMat, grayOriginalMat, Imgproc.COLOR_BGR2GRAY);
+        if (originalMat.channels() != 1 ) {
+            Imgproc.cvtColor(originalMat, grayOriginalMat, Imgproc.COLOR_BGR2GRAY);
+        } else {
+            originalMat.copyTo(grayOriginalMat);
+        }
         //В массив изображений добавляем оригинальную матрицу в градациях серого
         ArrayList<Mat> images = new ArrayList<Mat>();
         images.add(grayOriginalMat);

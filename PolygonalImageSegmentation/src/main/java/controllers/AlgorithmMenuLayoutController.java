@@ -30,7 +30,6 @@ public class AlgorithmMenuLayoutController implements Observer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AlgorithmMenuLayoutController.class);
 
-
     //Ref on model class - ImagesHandler
     private ImagesHandler imagesHandler;
 
@@ -117,6 +116,21 @@ public class AlgorithmMenuLayoutController implements Observer {
     public Accordion accordionMarkerMethodsParams;
     @FXML
     public AnchorPane anchorPaneRadioButtonMarker;
+
+    @FXML
+    public Label thresholdKMeansLabel;
+    @FXML
+    public Slider sliderThresholdKMeans;
+    @FXML
+    public Spinner spinnerDistBetweenMarkerAndLine;
+    @FXML
+    public Spinner spinnerRatioReductionLength;
+    @FXML
+    public Spinner spinnerDistBetweenNearLines;
+    @FXML
+    public Spinner spinnerCountIterationsKMeans;
+    @FXML
+    public Spinner spinnerCountClustersKMeans;
 
     //Формирование маркеров для алгоритма водоразделов
 
@@ -295,6 +309,11 @@ public class AlgorithmMenuLayoutController implements Observer {
     }
 
     @FXML
+    public void changeThresholdKMeansLabel(MouseEvent mouseEvent) {
+        thresholdKMeansLabel.setText(String.valueOf((int) sliderThresholdKMeans.getValue()));
+    }
+
+    @FXML
     private void handleWatershedMode(ActionEvent event) {
         if (watershedMode.isSelected()) {
             watershedMode.setText("Автоматический режим");
@@ -441,6 +460,22 @@ public class AlgorithmMenuLayoutController implements Observer {
     }
 
     private void autoHandleWatershed() {
-        imagesHandler.doWatershedSegmentationAutoMode();
+        double distanceBetweenLineAndMarkers = (double) spinnerDistBetweenMarkerAndLine.getValue();
+        double ratioReductionMarkers = (double) spinnerRatioReductionLength.getValue();
+
+        RadioButton button = (RadioButton) toggleGroupMarker.getSelectedToggle();
+        if (button.getId().equals("radiobGradient")) {
+            double maxDistBetweenParallelLines = (double) spinnerDistBetweenNearLines.getValue();
+            imagesHandler.doWatershedSegmentationAutoMode(1, distanceBetweenLineAndMarkers, ratioReductionMarkers, maxDistBetweenParallelLines);
+
+        } else if (button.getId().equals("radiobKMeans")) {
+            double brithnessPixelsThresholdKMeans = (double) sliderThresholdKMeans.getValue();
+            double countIterationsKMeans = (double) spinnerCountIterationsKMeans.getValue();
+            double countClustersKMeans = (double) spinnerCountClustersKMeans.getValue();
+            imagesHandler.doWatershedSegmentationAutoMode(2, distanceBetweenLineAndMarkers, ratioReductionMarkers, brithnessPixelsThresholdKMeans, countIterationsKMeans, countClustersKMeans);
+
+        } else if (button.getId().equals("radiobHistogramm")) {
+            imagesHandler.doWatershedSegmentationAutoMode(3, distanceBetweenLineAndMarkers, ratioReductionMarkers);
+        }
     }
 }

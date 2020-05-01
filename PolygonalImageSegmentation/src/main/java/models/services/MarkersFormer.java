@@ -17,22 +17,21 @@ public class MarkersFormer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MarkersFormer.class);
 
-    private static final double DISTANCE_BETWEEN_MARKERS_AND_LINE = 1.0;
-    private static final double REDUCTION_RATIO_LENGTH = 0.2;
-    private static final double BRITHNESS_PIXELS_THRESHOLD = 0;
-    private static final int KMEANS_ATTEMPTS = 20;
-    private static final int KMEANS_CLUSTERS = 4;
+    private double DISTANCE_BETWEEN_MARKERS_AND_LINE;
+    private double REDUCTION_RATIO_LENGTH;
 
     private Mat vectorOfLines;
     private Mat sourceMat;
 
-    public MarkersFormer(Mat vectorOfLines, Mat sourceMat) {
+    public MarkersFormer(Mat vectorOfLines, Mat sourceMat, double distanceBetweenLineAndMarkers, double ratioReductionMarkers) {
         this.vectorOfLines = vectorOfLines;
         this.sourceMat = sourceMat;
+        DISTANCE_BETWEEN_MARKERS_AND_LINE = distanceBetweenLineAndMarkers;
+        REDUCTION_RATIO_LENGTH = ratioReductionMarkers;
     }
 
 
-    public Mat prepareMaskOfMarkersByKMeans() {
+    public Mat prepareMaskOfMarkersByKMeans(double brithnessPixelsThresholdKMeans, int countIterationsKMeans, int countClustersKMeans) {
         // Создание маркерного изображения для метода k-средних
         Mat maskWithMarkers = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         //Все маркеры заносим в карту градиента маркеров
@@ -59,7 +58,8 @@ public class MarkersFormer {
         Mat bestLabels = new Mat();
         Mat centers = new Mat();
         TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS, 10, 1);
-        Core.kmeans(data, KMEANS_CLUSTERS , bestLabels, criteria, KMEANS_ATTEMPTS, Core.KMEANS_RANDOM_CENTERS, centers);
+        //fixme countClustersKMeans + 1 т.к. учавствует изображение полностью чёрное с маркерами в серых градациях, т.о. получается всплеск в области чёрного - это отдельный кластер
+        Core.kmeans(data, countClustersKMeans + 1, bestLabels, criteria, countIterationsKMeans, Core.KMEANS_RANDOM_CENTERS, centers);
 
         //Получаем центры кластеров, т.е. преобладания яркостей
         Mat colors = new Mat();
@@ -75,7 +75,7 @@ public class MarkersFormer {
             LOGGER.debug("aDouble: {}", aDouble);
             for (int i = 0; i < colors.cols(); i++) {
                 double delta = Math.abs(colors.get(0, i)[0] - aDouble);
-                if (delta <= BRITHNESS_PIXELS_THRESHOLD) {
+                if (delta <= brithnessPixelsThresholdKMeans) {
                     ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
                     for (Line line : a) {
                         createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
@@ -165,15 +165,17 @@ public class MarkersFormer {
      * 1. Преобразование векторов в массив линий с инвертированием координатных осей из-за особенностей OpenCV
      * 2. Передача массива линий в класс-валидатор
      * 3. Формирование маркеров для каждой отобранной линии
+     * @param maxDistBetweenParallelLines
      */
-    public Mat prepareMaskOfMarkersByGradient() {
+    public Mat prepareMaskOfMarkersByGradient(double maxDistBetweenParallelLines) {
+
         // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
         //Получаем все вектора ввиде массива
         ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
 
         //Делаем проверки всех полученных векторов, отбрасывая не надёжные
-        LinesValidator validator = new LinesValidator(sourceMat);
+        LinesValidator validator = new LinesValidator(sourceMat, maxDistBetweenParallelLines);
         lines = validator.validateByGradient(lines);
 
         for (Line currentLine : lines) {

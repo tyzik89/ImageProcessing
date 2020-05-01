@@ -182,17 +182,28 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new WatershedSegmentation(markers, matCurr));
     }
 
-    public void doWatershedSegmentationAutoMode() {
+    public void doWatershedSegmentationAutoMode(int type, double ... params) {
         Mat vectorOfStraightLines = StorageMatrix.getInstance().getMatrixOfLines();
         Mat matCurr = getSourceMat();
+        Mat maskOfMarkers = new Mat();
 
-        MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, matCurr);
+        double distanceBetweenLineAndMarkers = params[0];
+        double ratioReductionMarkers = params[1];
 
-        //todo тут пока меняем алгоритм
-//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient();
-//        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
-        Mat maskOfMarkers = markersFormer.prepareMaskOfMarkersByKMeans();
-        //todo тут пока меняем алгоритм
+        MarkersFormer markersFormer = new MarkersFormer(vectorOfStraightLines, matCurr, distanceBetweenLineAndMarkers, ratioReductionMarkers);
+        if (type == 1) {
+            double maxDistBetweenParallelLines = params[2];
+            maskOfMarkers = markersFormer.prepareMaskOfMarkersByGradient(maxDistBetweenParallelLines);
+
+        } else if (type == 2) {
+            double brithnessPixelsThresholdKMeans = params[2];
+            int countIterationsKMeans = (int) params[3];
+            int countClustersKMeans = (int) params[4];
+            maskOfMarkers = markersFormer.prepareMaskOfMarkersByKMeans(brithnessPixelsThresholdKMeans, countIterationsKMeans, countClustersKMeans);
+
+        } else if (type == 3) {
+            maskOfMarkers = markersFormer.prepareMaskOfMarkersByBarChart();
+        }
 
         //отображаем все маркеры на картинке
         showMarkersWithContours(maskOfMarkers, vectorOfStraightLines, matCurr);

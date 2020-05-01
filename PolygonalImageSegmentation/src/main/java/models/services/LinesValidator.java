@@ -10,11 +10,12 @@ import java.util.HashSet;
 public class LinesValidator {
 
     //Максимальная дистанция между отрезками, которые считаются близко расположенными
-    private static final double MAXIMAL_DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = 25.0;
+    private double MAXIMAL_DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES;
     private Mat originalMat;
 
-    public LinesValidator(Mat originalMat) {
+    public LinesValidator(Mat originalMat, double maxDistBetweenParallelLines) {
         this.originalMat = originalMat;
+        MAXIMAL_DISTANCE_BETWEEN_TWO_PARALLEL_NEAREST_LINES = maxDistBetweenParallelLines;
     }
 
     public ArrayList<Line> validateByGradient(ArrayList<Line> rawLines) {
