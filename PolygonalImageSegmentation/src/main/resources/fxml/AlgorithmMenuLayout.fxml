@@ -256,7 +256,7 @@
                          <content>
                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                               <children>
-                                 <Slider fx:id="sliderThresholdKMeans" onMouseClicked="#changeThresholdKMeansLabel" onMouseDragged="#changeThresholdKMeansLabel" blockIncrement="1.0" layoutX="-5.0" layoutY="34.0" max="128.0" minorTickCount="10" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
+                                 <Slider fx:id="sliderThresholdKMeans" onMouseClicked="#changeThresholdKMeansLabel" onMouseDragged="#changeThresholdKMeansLabel" blockIncrement="1.0" layoutX="-5.0" layoutY="34.0" max="32.0" minorTickCount="1" majorTickUnit="5" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
                                  <Spinner fx:id="spinnerCountIterationsKMeans" editable="true" layoutX="111.0" layoutY="105.0" prefHeight="25.0" prefWidth="79.0" AnchorPane.rightAnchor="20.0" >
                                      <valueFactory>
                                          <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="10.0" initialValue="10.0" max="100.0" min="1.0" />
@@ -273,8 +273,8 @@
                                          <Tooltip text="Количество кластеров для алгоритма К-средних" />
                                      </tooltip>
                                  </Spinner>
-                                 <Label fx:id="thresholdKMeansLabel" layoutX="227.0" layoutY="14.0" AnchorPane.rightAnchor="0.0" />
-                                 <Label layoutX="31.0" layoutY="14.0" text="Порог принадлежности к кластеру:" AnchorPane.leftAnchor="0.0" />
+                                 <Label fx:id="thresholdKMeansLabel" layoutX="227.0" layoutY="14.0" text="0" AnchorPane.rightAnchor="0.0" />
+                                 <Label layoutX="31.0" layoutY="14.0" text="Порог принадлежности к центру кластера:" AnchorPane.leftAnchor="0.0" />
                                  <Label layoutX="14.0" layoutY="109.0" text="Количество итераций:" AnchorPane.leftAnchor="0.0" />
                                  <Label layoutX="14.0" layoutY="145.0" text="Количество кластеров:" AnchorPane.leftAnchor="0.0" />
                               </children></AnchorPane>

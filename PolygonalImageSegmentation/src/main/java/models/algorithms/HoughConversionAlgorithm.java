@@ -97,7 +97,7 @@ public class HoughConversionAlgorithm implements Algorithm {
                         pt2,
                         ImageUtils.COLOR_RED,
                         1,
-                        4);
+                        8);
             }
 
         } else {
@@ -116,7 +116,7 @@ public class HoughConversionAlgorithm implements Algorithm {
                             new Point(line[2], line[3]),
                             ImageUtils.COLOR_RED,
                             1,
-                            4);
+                            8);
                 }
             }
         }

@@ -30,8 +30,11 @@ public class BarChartHandler {
         Mat histGray = new Mat();
         //Вычисляем гистограмму
         Imgproc.calcHist(images, new MatOfInt(0), maskWithMarker, histGray, new MatOfInt(256), new MatOfFloat(0, 256));
-        // Нормализация диапазона
+
+       /* // Нормализация диапазона
         Core.normalize(histGray, histGray, 0, 128, Core.NORM_MINMAX);
+
+
         // Отрисовка гистограмм
         double v = 0;
         int h = 150;
@@ -46,7 +49,7 @@ public class BarChartHandler {
         }
         ShowImage.show(ImageUtils.matToImageFX(imgHistGray), "BarChart");
 
-//        System.out.println(histGray.dump());
+//        System.out.println(histGray.dump());*/
         return histGray;
     }
 

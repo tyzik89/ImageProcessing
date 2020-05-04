@@ -50,8 +50,6 @@ public class MarkersFormer {
         //Копируем все маркерные пиксели из оригинала в нашу маркерную матрицу
         sourceMat.copyTo(maskWithMarkersOriginalImage, maskWithMarkers);
 
-        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersOriginalImage), "maskWithMarkersOriginalImage");
-
         //Преобразовываем маркерную матрицу в матрицу типа CV_32F для метода KMeans
         Mat data = maskWithMarkersOriginalImage.reshape(1, maskWithMarkersOriginalImage.rows() * maskWithMarkersOriginalImage.cols() * maskWithMarkersOriginalImage.channels());
         data.convertTo(data, CvType.CV_32F, 1.0 / 255);
@@ -59,8 +57,9 @@ public class MarkersFormer {
         //Применяем метод к-средних
         Mat bestLabels = new Mat();
         Mat centers = new Mat();
-        TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS, 10, 1);
-        //fixme countClustersKMeans + 1 т.к. учавствует изображение полностью чёрное с маркерами в серых градациях, т.о. получается всплеск в области чёрного - это отдельный кластер
+//        TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS, 10, 1);
+        TermCriteria criteria = new TermCriteria(TermCriteria.EPS, 10, 1);
+        //fixme countClustersKMeans + 1 т.к. участвует изображение полностью чёрное с маркерами в серых градациях, т.о. получается всплеск в области чёрного - это отдельный кластер
         countClustersKMeans++;
         Core.kmeans(data, countClustersKMeans, bestLabels, criteria, countIterationsKMeans, Core.KMEANS_PP_CENTERS, centers);
 
@@ -68,6 +67,11 @@ public class MarkersFormer {
         Mat colors = new Mat();
         centers.t().convertTo(colors, CvType.CV_8U, 255);
         LOGGER.debug("Colors.dump: {}", colors.dump());
+        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkersOriginalImage), "maskWithMarkersOriginalImage");
+        //Выводим график пиксель-яркость
+        Mat h = new BarChartHandler(sourceMat).createBarChart(maskWithMarkersOriginalImage).t();
+        Core.normalize(h, h, 0, 500, Core.NORM_MINMAX);
+        ShowImage.showScatterChart(h, "Pixels-Brightness", colors);
 
         // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
@@ -77,6 +81,8 @@ public class MarkersFormer {
             //Яркость каждого маркера проверяем на принадлежность к какому-либо кластеру, иначе отбрасываем
             LOGGER.debug("aDouble: {}", aDouble);
             for (int i = 0; i < colors.cols(); i++) {
+                //fixme
+                if (colors.get(0, i)[0] == 0) continue;
                 double delta = Math.abs(colors.get(0, i)[0] - aDouble);
                 if (Double.compare(brithnessPixelsThresholdKMeans, delta) != -1) {
                     ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
@@ -151,8 +157,8 @@ public class MarkersFormer {
             createMaskWithMarker(secondMarker, maskWithMarker, ImageUtils.COLOR_WHITE);
 
             //Находим градиент маркеров и помещаем их в мапу
-            double firstMarkerGradient = gradientComparator.findLineGradient(firstMarker.getInnerPoints());
-            double secondMarkerGradient = gradientComparator.findLineGradient(secondMarker.getInnerPoints());
+            double firstMarkerGradient = Math.round(gradientComparator.findLineGradient(firstMarker.getInnerPoints()));
+            double secondMarkerGradient = Math.round(gradientComparator.findLineGradient(secondMarker.getInnerPoints()));
 //            System.out.println(firstMarkerGradient + " " + secondMarkerGradient);
             ArrayList<Line> al1 = gradientOfLinesArrayMap.get(firstMarkerGradient);
             if (al1 == null) {
@@ -243,7 +249,7 @@ public class MarkersFormer {
                 invert_end,
                 color,
                 1,
-                4);
+                8);
     }
 
     private void reduceMarkerLength(Line m, double ratio) {

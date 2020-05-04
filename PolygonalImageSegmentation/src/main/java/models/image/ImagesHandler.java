@@ -149,7 +149,7 @@ public class ImagesHandler implements Observable {
     }
 
     public void doWatershedSegmentationManualMode(Map<Color, List<Line>> colorListMap) {
-        Mat matCurr = ImageUtils.imageFXToMat(storageImages.getCurrentImage());
+        Mat matCurr = getSourceMat();
         //Создание маркерного изображения для алгоритма водоразделов
         Mat markers = Mat.zeros(matCurr.size(), CvType.CV_32S);
 
@@ -164,7 +164,7 @@ public class ImagesHandler implements Observable {
             for (Line line : currentLines) {
                 Imgproc.line(mask,
                         new Point(line.getStartX(), line.getStartY()), new Point(line.getEndX(), line.getEndY()),
-                        currentColorScalarGray, 1);
+                        currentColorScalarGray, 1, 8);
             }
 
             // Находим контуры маркеров
@@ -218,6 +218,9 @@ public class ImagesHandler implements Observable {
 //        ShowImage.show(ImageUtils.matToImageFX(markers), "Markers");
         //Результирующая матрица
         Mat result = new Mat(sourceMat.size(), CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        markers.copyTo(result, markers);
+
+        Imgproc.cvtColor(result, result, Imgproc.COLOR_GRAY2BGR);
         for (int i = 0, r = vectorOfStraightLines.rows(); i < r; i++) {
             for (int j = 0, c = vectorOfStraightLines.cols(); j < c; j++) {
                 double[] line = vectorOfStraightLines.get(i, j);
@@ -225,12 +228,11 @@ public class ImagesHandler implements Observable {
                         result,
                         new Point(line[0], line[1]),
                         new Point(line[2], line[3]),
-                        new Scalar(80, 80, 80),
+                        ImageUtils.COLOR_RED,
                         1,
-                        4);
+                        8);
             }
         }
-        markers.copyTo(result, markers);
         ShowImage.show(ImageUtils.matToImageFX(result), "LinesWithOurMarkers");
     }
 }
