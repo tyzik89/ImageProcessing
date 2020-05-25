@@ -49,6 +49,33 @@
                     <Label layoutX="18.0" layoutY="189.0" text="Размер фильтра Гаусса:" AnchorPane.leftAnchor="0.0" />
                     <Label fx:id="showSizeGaussFilterCommon" layoutX="184.0" layoutY="187.0" prefHeight="21.0" prefWidth="39.0" />
                     <Slider fx:id="sizeGaussFilterCommon" blockIncrement="1" layoutX="14.0" layoutY="213.0" majorTickUnit="5" max="10" minorTickCount="1" onMouseClicked="#changeSizeGaussFilterCommon" onMouseDragged="#changeSizeGaussFilterCommon" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Separator layoutX="8.0" layoutY="249.0" prefHeight="24.0" prefWidth="232.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Button layoutX="57.6" layoutY="273.0" mnemonicParsing="false" onAction="#makeBilateralFilter" text="Билатеральный фильтр" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <tooltip>
+                     <Tooltip text="Билатеральный фильтр"/>
+                  </tooltip>
+               </Button>
+               <Spinner fx:id="sigmaSpace" layoutX="159.0" layoutY="380.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0" editable="true">
+                   <valueFactory>
+                       <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="1" initialValue="80" max="200" min="1" />
+                   </valueFactory>
+               </Spinner>
+               <Spinner fx:id="sigmaColor" layoutX="75.0" layoutY="347.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0" editable="true">
+                   <valueFactory>
+                       <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="1" initialValue="80" max="200" min="1" />
+                   </valueFactory>
+               </Spinner>
+               <Spinner fx:id="pixelNeighborhoodDiameter" layoutX="159.0" layoutY="314.0" prefHeight="25.0" prefWidth="90.0" AnchorPane.rightAnchor="10.0" editable="true">
+                   <valueFactory>
+                       <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" initialValue="15" max="200" min="-200" />
+                   </valueFactory>
+                   <tooltip>
+                       <Tooltip text="Если значение не является положительным, оно вычисляется из sigmaSpace" />
+                   </tooltip>
+               </Spinner>
+               <Label layoutX="33.0" layoutY="318.0" text="Диаметр каждого пикселя:" AnchorPane.leftAnchor="0.0" />
+               <Label layoutX="33.0" layoutY="351.0" text="Стандарт. отклонение цвета:" AnchorPane.leftAnchor="0.0" />
+               <Label layoutX="33.0" layoutY="384.0" text="Стандарт. отклонение простр-ва:" AnchorPane.leftAnchor="0.0" />
                 </AnchorPane>
             </TitledPane>
 
@@ -256,8 +283,8 @@
                          <content>
                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                               <children>
-                                 <Slider fx:id="sliderThresholdKMeans" onMouseClicked="#changeThresholdKMeansLabel" onMouseDragged="#changeThresholdKMeansLabel" blockIncrement="1.0" layoutX="-5.0" layoutY="34.0" max="32.0" minorTickCount="1" majorTickUnit="5" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
-                                 <Spinner fx:id="spinnerCountIterationsKMeans" editable="true" layoutX="111.0" layoutY="105.0" prefHeight="25.0" prefWidth="79.0" AnchorPane.rightAnchor="20.0" >
+                                 <Slider fx:id="sliderThresholdKMeans" blockIncrement="1.0" layoutX="-5.0" layoutY="34.0" majorTickUnit="5" max="32.0" minorTickCount="1" onMouseClicked="#changeThresholdKMeansLabel" onMouseDragged="#changeThresholdKMeansLabel" showTickLabels="true" showTickMarks="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                                 <Spinner fx:id="spinnerCountIterationsKMeans" editable="true" layoutX="111.0" layoutY="105.0" prefHeight="25.0" prefWidth="79.0" AnchorPane.rightAnchor="20.0">
                                      <valueFactory>
                                          <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="10.0" initialValue="10.0" max="100.0" min="1.0" />
                                      </valueFactory>
@@ -265,7 +292,7 @@
                                          <Tooltip text="Количество попыток для алгоритма К-средних" />
                                      </tooltip>
                                  </Spinner>
-                                 <Spinner fx:id="spinnerCountClustersKMeans" layoutX="111.0" layoutY="141.0" prefHeight="25.0" prefWidth="78.0" AnchorPane.rightAnchor="20.0" >
+                                 <Spinner fx:id="spinnerCountClustersKMeans" layoutX="111.0" layoutY="141.0" prefHeight="25.0" prefWidth="78.0" AnchorPane.rightAnchor="20.0">
                                      <valueFactory>
                                          <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="1.0" initialValue="3.0" max="10.0" min="1.0" />
                                      </valueFactory>

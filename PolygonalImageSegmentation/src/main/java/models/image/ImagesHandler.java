@@ -140,6 +140,10 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new BinaryImageAlgorithm(threshold, isOtsu));
     }
 
+    public void doMakeBilateralFilter(int pixelNeighborhoodDiameter, double sigmaColor, double sigmaSpace) {
+        doMakeAlgorithm(new BilateralImageAlgorithm(pixelNeighborhoodDiameter, sigmaColor, sigmaSpace));
+    }
+
     public void doCannyEdgeDetection(int sizeGaussFilter, int threshold, int sizeSobelKernel, boolean isUseL2Gradient) {
         doMakeAlgorithm(new CannyEdgeDetectorAlgorithm(sizeGaussFilter, threshold, sizeSobelKernel, isUseL2Gradient));
     }

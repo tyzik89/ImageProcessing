@@ -52,6 +52,12 @@ public class AlgorithmMenuLayoutController implements Observer {
     @FXML
     private Label showSizeGaussFilterCommon;
     @FXML
+    public Spinner sigmaSpace;
+    @FXML
+    public Spinner sigmaColor;
+    @FXML
+    public Spinner pixelNeighborhoodDiameter;
+    @FXML
     private Slider thresholdCanny;
     @FXML
     private Label showThresholdCanny;
@@ -167,6 +173,14 @@ public class AlgorithmMenuLayoutController implements Observer {
     @FXML
     private void makeBlur(ActionEvent event) {
         imagesHandler.doMakeBlur((int) sizeGaussFilterCommon.getValue());
+    }
+
+    @FXML
+    public void makeBilateralFilter(ActionEvent event) {
+        imagesHandler.doMakeBilateralFilter(
+                (int) pixelNeighborhoodDiameter.getValue(),
+                (double) sigmaColor.getValue(),
+                (double) sigmaSpace.getValue());
     }
 
     @FXML
