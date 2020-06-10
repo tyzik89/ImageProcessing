@@ -52,20 +52,20 @@
                <Separator layoutX="8.0" layoutY="249.0" prefHeight="24.0" prefWidth="232.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                <Button layoutX="57.6" layoutY="273.0" mnemonicParsing="false" onAction="#makeBilateralFilter" text="Билатеральный фильтр" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                   <tooltip>
-                     <Tooltip text="Билатеральный фильтр"/>
+                     <Tooltip text="Билатеральный фильтр" />
                   </tooltip>
                </Button>
-               <Spinner fx:id="sigmaSpace" layoutX="159.0" layoutY="380.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0" editable="true">
+               <Spinner fx:id="sigmaSpace" editable="true" layoutX="159.0" layoutY="380.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0">
                    <valueFactory>
                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="1" initialValue="80" max="200" min="1" />
                    </valueFactory>
                </Spinner>
-               <Spinner fx:id="sigmaColor" layoutX="75.0" layoutY="347.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0" editable="true">
+               <Spinner fx:id="sigmaColor" editable="true" layoutX="75.0" layoutY="347.0" prefHeight="25.0" prefWidth="89.0" AnchorPane.rightAnchor="10.0">
                    <valueFactory>
                        <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="1" initialValue="80" max="200" min="1" />
                    </valueFactory>
                </Spinner>
-               <Spinner fx:id="pixelNeighborhoodDiameter" layoutX="159.0" layoutY="314.0" prefHeight="25.0" prefWidth="90.0" AnchorPane.rightAnchor="10.0" editable="true">
+               <Spinner fx:id="pixelNeighborhoodDiameter" editable="true" layoutX="159.0" layoutY="314.0" prefHeight="25.0" prefWidth="90.0" AnchorPane.rightAnchor="10.0">
                    <valueFactory>
                        <SpinnerValueFactory.IntegerSpinnerValueFactory amountToStepBy="1" initialValue="15" max="200" min="-200" />
                    </valueFactory>
@@ -76,6 +76,21 @@
                <Label layoutX="33.0" layoutY="318.0" text="Диаметр каждого пикселя:" AnchorPane.leftAnchor="0.0" />
                <Label layoutX="33.0" layoutY="351.0" text="Стандарт. отклонение цвета:" AnchorPane.leftAnchor="0.0" />
                <Label layoutX="33.0" layoutY="384.0" text="Стандарт. отклонение простр-ва:" AnchorPane.leftAnchor="0.0" />
+               <Separator layoutX="18.0" layoutY="408.0" prefHeight="24.0" prefWidth="232.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+               <Button layoutX="81.6" layoutY="433.0" mnemonicParsing="false" onAction="#makeTopHat" text="Выравнивание фона" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <tooltip>
+                     <Tooltip text="Выравнивание фона" />
+                  </tooltip>
+               </Button>
+               <Spinner fx:id="topHatKernelSize" editable="true" layoutX="163.0" layoutY="470.0" prefHeight="25.0" prefWidth="90.0" AnchorPane.rightAnchor="10.0">
+                  <valueFactory>
+                     <SpinnerValueFactory.DoubleSpinnerValueFactory amountToStepBy="2.0" initialValue="3.0" max="200.0" min="3.0" />
+                  </valueFactory>
+                  <tooltip>
+                     <Tooltip text="Размер ядра матрицы для размыкания" />
+                  </tooltip>
+               </Spinner>
+               <Label layoutX="37.0" layoutY="474.0" text="Размер ядра для размыкания:" AnchorPane.leftAnchor="0.0" />
                 </AnchorPane>
             </TitledPane>
 

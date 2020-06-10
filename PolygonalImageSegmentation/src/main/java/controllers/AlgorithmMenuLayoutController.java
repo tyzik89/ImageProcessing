@@ -58,6 +58,8 @@ public class AlgorithmMenuLayoutController implements Observer {
     @FXML
     public Spinner pixelNeighborhoodDiameter;
     @FXML
+    public Spinner topHatKernelSize;
+    @FXML
     private Slider thresholdCanny;
     @FXML
     private Label showThresholdCanny;
@@ -181,6 +183,13 @@ public class AlgorithmMenuLayoutController implements Observer {
                 (int) pixelNeighborhoodDiameter.getValue(),
                 (double) sigmaColor.getValue(),
                 (double) sigmaSpace.getValue());
+    }
+
+    @FXML
+    public void makeTopHat(ActionEvent event) {
+        imagesHandler.doMakeTopHat(
+                (double) topHatKernelSize.getValue()
+        );
     }
 
     @FXML

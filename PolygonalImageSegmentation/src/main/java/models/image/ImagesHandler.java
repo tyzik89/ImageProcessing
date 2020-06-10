@@ -144,6 +144,11 @@ public class ImagesHandler implements Observable {
         doMakeAlgorithm(new BilateralImageAlgorithm(pixelNeighborhoodDiameter, sigmaColor, sigmaSpace));
     }
 
+    public void doMakeTopHat(double topHatKernelSize) {
+        Size kSize = new Size(topHatKernelSize, topHatKernelSize);
+        doMakeAlgorithm(new TopHat(kSize));
+    }
+
     public void doCannyEdgeDetection(int sizeGaussFilter, int threshold, int sizeSobelKernel, boolean isUseL2Gradient) {
         doMakeAlgorithm(new CannyEdgeDetectorAlgorithm(sizeGaussFilter, threshold, sizeSobelKernel, isUseL2Gradient));
     }
