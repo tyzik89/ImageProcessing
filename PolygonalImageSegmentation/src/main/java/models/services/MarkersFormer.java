@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import utils.ImageUtils;
 import utils.ShowImage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MarkersFormer {
 
@@ -71,7 +68,7 @@ public class MarkersFormer {
         //Выводим график пиксель-яркость
         Mat h = new BarChartHandler(sourceMat).createBarChart(maskWithMarkersOriginalImage).t();
         Core.normalize(h, h, 0, 500, Core.NORM_MINMAX);
-        ShowImage.showScatterChart(h, "Pixels-Brightness", colors);
+        ShowImage.showScatterChart(1, h, "Pixels-Brightness", colors);
 
         // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
         Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
@@ -104,7 +101,7 @@ public class MarkersFormer {
         return maskWithMarker;
     }
 
-    public Mat prepareMaskOfMarkersByBarChart() {
+    /*public Mat prepareMaskOfMarkersByBarChart() {
         // Создание маркерного изображения для гистограммы.
         Mat maskWithMarkers = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
         // Создаём карту градиентво маркеров
@@ -139,8 +136,113 @@ public class MarkersFormer {
         }
 
         return maskWithMarkerForWatershed;
-    }
+    }*/
 
+    public Mat prepareMaskOfMarkersByBarChart() {
+        // Создание маркерного изображения для гистограммы.
+        Mat maskWithMarkerForBarChart = new Mat(sourceMat.size(),  CvType.CV_8UC1, ImageUtils.COLOR_BLACK);
+        //Получаем все вектора ввиде массива
+        ArrayList<Line> lines = getArrayOfLines(vectorOfLines);
+        //Создаём маску маркеров по всем найденным линиям
+        //Все маркеры заносим в карту градиента маркеров
+        Map<Double, ArrayList<Line>> gradientOfLinesArrayMap = new HashMap<>();
+        GradientComparator gradientComparator = new GradientComparator(sourceMat);
+        for (Line currentLine : lines) {
+            Line firstMarker = new Line();
+            Line secondMarker = new Line();
+            //Находим параллельные маркеры для этой линии, лежащие на определенном растоянии от линии
+            findParallelMarkers(currentLine, firstMarker, secondMarker, 1.0);
+            //Уменьшаем маркер, чтобы он был чуть меньше границы объекта
+            reduceMarkerLength(firstMarker, REDUCTION_RATIO_LENGTH);
+            reduceMarkerLength(secondMarker, REDUCTION_RATIO_LENGTH);
+            createMaskWithMarker(firstMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
+            createMaskWithMarker(secondMarker, maskWithMarkerForBarChart, ImageUtils.COLOR_WHITE);
+
+            //Находим градиент маркеров и помещаем их в мапу
+            double firstMarkerGradient = gradientComparator.findLineGradient(firstMarker.getInnerPoints());
+            double secondMarkerGradient = gradientComparator.findLineGradient(secondMarker.getInnerPoints());
+//            System.out.println(firstMarkerGradient + " " + secondMarkerGradient);
+            ArrayList<Line> al1 = gradientOfLinesArrayMap.get(firstMarkerGradient);
+            if (al1 == null) {
+                gradientOfLinesArrayMap.put(firstMarkerGradient, new ArrayList<Line>(){{add(firstMarker);}});
+            } else {
+                al1.add(firstMarker);
+            }
+            ArrayList<Line> al2 = gradientOfLinesArrayMap.get(secondMarkerGradient);
+            if (al2 == null) {
+                gradientOfLinesArrayMap.put(secondMarkerGradient, new ArrayList<Line>(){{add(secondMarker);}});
+            } else {
+                al2.add(secondMarker);
+            }
+        }
+        ShowImage.show(ImageUtils.matToImageFX(maskWithMarkerForBarChart), "maskWithMarkerForBarChart");
+        BarChartHandler barChartHandler = new BarChartHandler(sourceMat);
+        Mat histogramm = barChartHandler.createBarChart(maskWithMarkerForBarChart);
+
+//===================проверка===========================================================================================
+        int countMods = 0;
+        List<Integer> values = new ArrayList<>();
+        for (int i = 0; i < histogramm.rows(); i++) {
+            double val = histogramm.get(i, 0)[0];
+            if (val > 0) {
+                countMods++;
+                System.out.println(i + ": " + val);
+                values.add(i);
+            }
+        }
+        LOGGER.debug("Кластеры: {} \nКол-во кластеров: {}", Arrays.toString(values.toArray()), values.size());
+//===================проверка===========================================================================================
+        //Транспонируем
+        histogramm = histogramm.t();
+        LOGGER.debug(histogramm.dump());
+        double[] thresholds = barChartHandler.multiOtsu3Thresholds(histogramm);
+        LOGGER.debug("thresholds = {}", Arrays.toString(thresholds));
+
+
+        //Матрица с маркерами, которые содержат яркость пикселей оригинала
+        Mat maskWithMarkersOriginalImage = new Mat();
+        //Копируем все маркерные пиксели из оригинала в нашу маркерную матрицу
+        sourceMat.copyTo(maskWithMarkersOriginalImage, maskWithMarkerForBarChart);
+        //Преобразовываем маркерную матрицу в матрицу типа CV_32F для метода KMeans
+        Mat data = maskWithMarkersOriginalImage.reshape(1, maskWithMarkersOriginalImage.rows() * maskWithMarkersOriginalImage.cols() * maskWithMarkersOriginalImage.channels());
+        data.convertTo(data, CvType.CV_32F, 1.0 / 255);
+        //Выводим график пиксель-яркость
+        Mat h = new BarChartHandler(sourceMat).createBarChart(maskWithMarkersOriginalImage).t();
+        Core.normalize(h, h, 0, 500, Core.NORM_MINMAX);
+        ShowImage.showScatterChart(0, h, "Pixels-Brightness");
+
+
+
+
+        // Создание маркерного изображения для алгоритма водоразделов. Необходима 32 битная матрица
+        Mat maskWithMarker = new Mat(sourceMat.size(), CvType.CV_32S, ImageUtils.COLOR_BLACK);
+        int color = 80;
+        for (Double aDouble : gradientOfLinesArrayMap.keySet()) {
+            if (aDouble <= thresholds[0]) {
+                ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+                for (Line line : a) {
+                    createMaskWithMarker(line, maskWithMarker, Scalar.all(color));
+                }
+            } else if (aDouble > thresholds[0] && aDouble <= thresholds[1]) {
+                ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+                for (Line line : a) {
+                    createMaskWithMarker(line, maskWithMarker, Scalar.all(color + 20));
+                }
+            } else if (aDouble > thresholds[1] && aDouble <= thresholds[2]) {
+                ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+                for (Line line : a) {
+                    createMaskWithMarker(line, maskWithMarker, Scalar.all(color + 40));
+                }
+            } else if (aDouble > thresholds[2]) {
+                ArrayList<Line> a = gradientOfLinesArrayMap.get(aDouble);
+                for (Line line : a) {
+                    createMaskWithMarker(line, maskWithMarker, Scalar.all(color + 60));
+                }
+            }
+        }
+
+        return maskWithMarker;
+    }
 
     private void createMaskWithMarkerAndGradientMap(ArrayList<Line> lines, Mat maskWithMarker, Map<Double, ArrayList<Line>> gradientOfLinesArrayMap) {
         GradientComparator gradientComparator = new GradientComparator(sourceMat);
