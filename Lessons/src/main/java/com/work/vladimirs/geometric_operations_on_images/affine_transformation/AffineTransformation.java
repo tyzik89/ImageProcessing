@@ -115,7 +115,8 @@ public class AffineTransformation {
             } catch (FileNotFoundException | MatrixOperations.MatrixMismatchException e) {
                 System.out.println(e);
             }
-
+            System.out.println("Transformations is done.");
+            System.exit(0);
         }
     }
 }
