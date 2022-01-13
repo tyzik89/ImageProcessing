@@ -11,6 +11,17 @@ public class SinusoidalInterferenceCleaner {
 
     private static final String DIR_NAME = "src/main/resources/transformation_area_of_images/clean_sinusoidal_interference/SinusoidalInterferenceCleaner/";
 
+    void process(String pathToImage) {
+
+    }
+
+    /**
+     * Наложение на изображение синусоидального шума.
+     * Синусоидальные помехи (СП) - помехи, сосредоточенные по спектру.
+     */
+    public static class SinusoidalInterferenceAdder {
+
+    }
 
     /**
      * Запуск
