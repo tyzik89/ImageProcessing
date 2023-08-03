@@ -1,12 +1,42 @@
 package com.work.vladimirs.utils;
 
 import javafx.scene.image.*;
+import javafx.scene.paint.Color;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 public final class ImageUtils {
+
+    public static final Scalar COLOR_BLACK = colorRGB(0, 0, 0);
+    public static final Scalar COLOR_WHITE = colorRGB(255, 255, 255);
+    public static final Scalar COLOR_RED = colorRGB(255, 0, 0);
+    public static final Scalar COLOR_BLUE = colorRGB(0, 0, 255);
+    public static final Scalar COLOR_GREEN = colorRGB(0, 128, 0);
+    public static final Scalar COLOR_YELLOW = colorRGB(255, 255, 0);
+    public static final Scalar COLOR_GRAY = colorRGB(128, 128, 128);
+
+    public static Scalar colorRGB(double red, double green, double blue) {
+        return new Scalar(blue, green, red);
+    }
+
+    public static Scalar colorRGBA(double red, double green, double blue,
+                                   double alpha) {
+        return new Scalar(blue, green, red, alpha);
+    }
+
+    public static Scalar colorRGB(Color c) {
+        return new Scalar((double) Math.round(c.getBlue() * 255),
+                (double) Math.round(c.getGreen() * 255),
+                (double) Math.round(c.getRed() * 255));
+    }
+    public static Scalar colorRGBA(Color c) {
+        return new Scalar((double) Math.round(c.getBlue() * 255),
+                (double) Math.round(c.getGreen() * 255),
+                (double) Math.round(c.getRed() * 255),
+                (double) Math.round(c.getOpacity() * 255));
+    }
 
     /**
      * Конвертация матрицы {@link Mat} в объект Image {@link Image} для JavaFX
